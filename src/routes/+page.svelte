@@ -24,25 +24,32 @@
 <div class="content">
     <h1 class="projects">Projects</h1>
     <div class="card-container">
-        <a href="https://chessconnect.xyz/" target="_blank" class="card">
-            <div class="thumbnail" style="--url: url('/thumbnails/chess10.png');">
-                <img src="chessconnect3d.PNG">
-            </div>
-            <div class="title">Chess 10</div>
-            <p class="desc">A Chess theme'd contact manager that also includes a physics engine written in vanilla javascript at <a target="_blank" href="https://chessconnect.xyz/threeD/test.html">this secrete page</a></p>
-        </a><a href="https://codeclash.app" target="_blank" class="card">
+    
+        
+        <a href="https://codeclash.app" target="_blank" class="card">
             <div class="thumbnail2" style="--url: url('/thumbnails/tanks.png');">
                 <img src="codeclashgame.PNG">
             </div>
             <div class="title">Code Clash</div>
             <p class="desc">An online competative programing game where users can battle each other in a 1v1 to see who can solve leetcode problems faster. Elo system and ranking included.</p>
-        </a><a href="https://chibichain.com" target="_blank" class="card">
+        </a>
+        <a href="https://chessconnect.xyz/threeD/test.html" target="_blank" class="card">
+            <div class="thumbnail" style="--url: url('/thumbnails/chess10.png');">
+                <img src="chessconnect3d.PNG">
+            </div>
+            <div class="title">Chess Connect</div>
+            <p class="desc">A Chess theme'd contact manager that also includes a physics engine written in vanilla javascript at this page.</p>
+        </a>
+        
+        <a href="https://chibichain.com" target="_blank" class="card">
             <div class="thumbnail2" style="--url: url('/thumbnails/game-of-life.png');">
                 <img src="Chibichain.PNG">
             </div>
             <div class="title">Chibi Chain</div>
             <p class="desc">A free linktree alternative with an anime theme and extra features such as adding songs to your page.</p>
-        </a><a href="https://kawaiikulture.shop" target="_blank" class="card">
+        </a>
+        
+        <a href="https://kawaiikulture.shop" target="_blank" class="card">
             <div class="thumbnail" style="--url: url('/thumbnails/softbody-tetris.png');">
                 <img src="kawaiikulture.PNG">
             </div>
