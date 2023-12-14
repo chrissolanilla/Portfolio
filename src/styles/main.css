@@ -1,0 +1,42 @@
+:root {
+    --font: "Source Serif Pro", "Times New Roman", Times, serif;
+    --code-font: "Ubuntu Mono", "Courier New", Courier, monospace;
+    --header-font: Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --body-bg: #fff;
+    --content-bg: #fff;
+    --fg: #000;
+    --secondary-fg: #888;
+    --selection: #07f4;
+    --hr: #ccc;
+    --scale: min(calc(11px + 1.5vw), 8vmin);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --body-bg: #333538;
+        --content-bg: #333538;
+        --fg: #eee;
+        --secondary-fg: #aaa;
+        --selection: #0cf6;
+        --hr: #678;
+    }
+}
+
+body {
+    background-color: #2c2a2e;
+    font-family: arial;
+}
+* {
+    box-sizing: border-box;
+}
+
+a:visited:not(.unvisitable) {
+    color: #cc00cc; /* Adjusted for simplicity */
+}
+
+h1{
+    color:white;
+}
+p{
+    color:white;
+}
