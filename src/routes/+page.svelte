@@ -60,7 +60,7 @@
                 <img src="screnshot1.png" alt="screenshot">
             </div>
             <div class="title">Yatagarasu Sunshine</div>
-            <p class="desc">A third person 3D bullet hell game that was made in two days during the FIEA Game Jam. The game was made in Unreal Engine 5 and runs on windows and Linux x86. </p>
+            <p class="desc">A third person 3D bullet-hell game that was made in two days during the FIEA Game Jam. The game was made in Unreal Engine 5 and runs on windows and Linux x86. </p>
         </a>
 
         <a href="https://codeclash.app" target="_blank" class="card">
