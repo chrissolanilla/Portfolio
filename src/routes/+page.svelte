@@ -41,6 +41,7 @@
         <h2 class="who">a developer</h2>
         <div class="links">
             <a href="https://github.com/chrissolanilla">GitHub</a>
+            <a href="https://bustopher.itch.io/" target="_blank" >Itch.io</a>
             <a href="https://www.linkedin.com/in/christopher-solanilla-837299224/">LinkedIn</a>
             <a href="mailto:chrissolanilla@gmail.com">Email</a>
         </div>
@@ -202,7 +203,9 @@
         margin-bottom: 0%;
     }
 
-
+    .links a {
+        padding: 12px;
+    }
     .title {
         font-size: var(--scale);
         font-weight: bold;
