@@ -34,6 +34,11 @@ a:visited:not(.unvisitable) {
     color: #00cc88; /* Adjusted for simplicity */
 }
 
+a  {
+    color: #e2ee3e; /* Adjusted for simplicity */
+}
+
+
 h1{
     color:white;
 }
