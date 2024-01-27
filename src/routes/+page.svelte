@@ -1,18 +1,31 @@
 
-    <svelte:head>
+<svelte:head>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.net.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.net.min.js"></script>
 
-    </svelte:head>
-    <script lang="ts">
+</svelte:head>
+<script lang="ts">
+    import { onMount } from 'svelte';
+
+    let message = 'Loading...';
+
+    onMount(async () => {
+        const response = await fetch('http://localhost:3000/api/sayHi');
+        if (response.ok) {
+            message = await response.text();
+        } else {
+            message = 'Failed to fetch message';
+        }
+    });
+
     function scrollToContent() {
         const contentElement = document.querySelector('.content');
         if(contentElement)
             contentElement.scrollIntoView({ behavior: 'smooth' });
     }
 
-    import { onMount } from 'svelte';
+    //end of stuff
     onMount(() => {
         VANTA.NET({
             el: "#vanta-element", // Target element ID
@@ -28,7 +41,8 @@
             points: 6.00
         });
     });
-    </script>
+</script>
+
 
     <div id="vanta-element" class="intro">
     <!-- Your content here -->
@@ -230,7 +244,7 @@
     width: 100%;
     height: 100%;
     z-index: -1000000; /* Behind everything else */
-}
+    }
 
 
     </style>
