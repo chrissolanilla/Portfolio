@@ -11,7 +11,7 @@
 
     if (browser) {
       onMount(() => {
-        socket = io('http://localhost:3000');
+        socket = io('https://portfolioclocktower-2624735c9cd9.herokuapp.com/');
   
         socket.on('message', (msg) => {
             messages = [...messages, { text: msg, type: 'received' }]; //adds received messages to the list
