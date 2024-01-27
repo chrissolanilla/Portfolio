@@ -9,7 +9,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"start": "node server/index.js", 
-    	"heroku-postbuild": "echo 'No post-build steps required for backend'" 
+    	"heroku-postbuild": "cd server && npm install && npm run build'" 
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.0.0",
