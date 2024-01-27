@@ -6,17 +6,22 @@
     let message = 'no initial message';
     let socket;
     let inputMessage = '';
-
+    
+    let userCount = 0; //reactive varible
     let messages= []; //array to store messages
 
     if (browser) {
       onMount(() => {
         const backendURL = import.meta.env.VITE_BACKEND_URL;
         socket = io(backendURL);
-  
+        //add functionalities of websockets
         socket.on('message', (msg) => {
             messages = [...messages, { text: msg, type: 'received' }]; //adds received messages to the list
         });
+
+        socket.on('userCount', (data) => {
+          userCount = data.count; //update user count here 
+        })
       });
   
       onDestroy(() => {
@@ -35,6 +40,8 @@
         }
     }
   </script>
+
+  <h2>Users Connected: {userCount}</h2>
   
   <input type="text" bind:value={inputMessage} />
   <button on:click={sendMessage}>Send Message</button>

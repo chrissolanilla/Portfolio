@@ -27,9 +27,13 @@ const io = require('socket.io')(server, {
       methods: ["GET", "POST"] // Allow only GET and POST requests
     }
   });
+
+  let userCount=0; //track the number of connected users. 
   
 
 io.on('connection', (socket) => {
+    userCount++; //increment user userCount
+    io.emit('userCount', { count: userCount }); //emit the count to all
     console.log('A user connected');
     
     socket.on('sendMessage', (msg) => {
@@ -39,7 +43,9 @@ io.on('connection', (socket) => {
     });
     
     socket.on('disconnect', () => {
+        userCount--; //decrement the user count
         console.log('User disconnected');
+        io.emit('userCount', { count: userCount })
     });
 });
 
