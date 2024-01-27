@@ -11,7 +11,8 @@
 
     if (browser) {
       onMount(() => {
-        socket = io('https://portfolioclocktower-2624735c9cd9.herokuapp.com/');
+        const backendURL = import.meta.env.VITE_BACKEND_URL;
+        socket = io(backendURL);
   
         socket.on('message', (msg) => {
             messages = [...messages, { text: msg, type: 'received' }]; //adds received messages to the list
@@ -47,11 +48,15 @@
 
 <style>
     .sent {
+      font-weight: bold;
+      font-size: 50px;
       text-align: right;
       color: blue;
     }
   
     .received {
+      font-weight: bold;
+      font-size: 50px;
       text-align: left;
       color: green;
     }
