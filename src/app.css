@@ -1,10 +1,8 @@
 /* src/app.css */
-:root {
-    --primary-color: #00796b;
-    --secondary-color: #b2dfdb;
-    --background-color: #e0f2f1;
-    --text-color: #263238;
-  }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
   
   body {
     margin: 0;
