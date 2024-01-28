@@ -28,24 +28,63 @@ const io = require('socket.io')(server, {
     }
   });
 
-  let userCount=0; //track the number of connected users. 
+let userCount=0; //track the number of connected users. 
+const activeUsers = {};// add an object to keep track of the users. 
   
 
 io.on('connection', (socket) => {
-    userCount++; //increment user userCount
-    io.emit('userCount', { count: userCount }); //emit the count to all
+    //doing my users names logic
+    let userName= ''; //sore the current users name
+    socket.emit('userCount', { count: Object.keys(activeUsers).length }) ; //send current user count immiedietly
+
+    socket.on('registerUser', (name) => {
+      if(userName) {
+        //user ahs already registered a name; ignore re-register
+        return;
+      }
+
+      if (activeUsers[name]) {
+        //name is already taken, send an error message back
+        socket.emit('registrationFailed', 'Name is already taken in this instace');
+      }
+      else {
+        //register the user
+        userName = name;
+        activeUsers[name] = socket.id;
+        socket.emit('registrationSuccess', 'Registered temporarily as ${name}');
+        userCount = Object.keys(activeUsers).length;
+        io.emit('userCount', { count: userCount});
+      }
+    });
+
+
+    // userCount++; //increment user userCount
+    // io.emit('userCount', { count: userCount }); //emit the count to all
     console.log('A user connected');
     
-    socket.on('sendMessage', (msg) => {
-        console.log('Message from client:', msg);
-        // Echo the message back to the client
-        socket.broadcast.emit('message', 'Message received: ' + msg);
-    });
+    socket.on('sendMessage', (messageObject) => {
+      console.log('Message from client:', messageObject);
+      // Include the sender's socket ID in the message object
+      const fullMessage = {
+        ...messageObject,
+        id: socket.id, // Add the sender's ID to the message object
+        type: 'received' // Assume all messages are received unless it's from the current user
+      };
+      // Emit the message to all clients except the sender
+      socket.broadcast.emit('message', fullMessage);
+      // Emit a 'sent' message back to the sender
+      socket.emit('message', { ...fullMessage, type: 'sent' });
+  });
     
     socket.on('disconnect', () => {
-        userCount--; //decrement the user count
+        if(userName){
+          delete activeUsers[userName]; //remove the user from activeUsers
+          userCount = Object.keys(activeUsers).length;
+          io.emit('userCount', { count: userCount });
+        }
+        // userCount--; //decrement the user count
         console.log('User disconnected');
-        io.emit('userCount', { count: userCount })
+        // io.emit('userCount', { count: userCount })
     });
 });
 
