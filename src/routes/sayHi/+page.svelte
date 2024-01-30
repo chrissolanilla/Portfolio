@@ -164,7 +164,8 @@ function handleEnterPress(event) {
     position: relative;
     padding: 10px;
     border-radius: 16px;
-    background: #bd93f9;;
+    background: #bd93f9;
+    color:white;
     max-width: 70%;
   }
 
