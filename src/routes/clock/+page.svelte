@@ -4,6 +4,7 @@
     import "../../app.css"
     import { browser } from '$app/environment';
 
+    let errMsg = '';
     let socket;
     let lobbies = []; //array to store lobbies
     let gameName = '';
@@ -25,15 +26,21 @@
             })
     
             // Function to join a lobby
-            function joinLobby(lobbyId) {
-                socket.emit('joinLobby', lobbyId);
-            }
-    
+            
             // Additional functions for creating lobbies, leaving lobbies, etc.
+            socket.on('lobbyCreationFailed', (message) => {
+                errMsg = message; // Update the errorMessage with the received message
+                // Optionally, clear the message after a delay
+                setTimeout(() => errMsg = '', 3000); // Clears the error message after 3 seconds
+            });
+
         });
     }
-
-
+    
+    function joinLobby(lobbyId) {
+        socket.emit('joinLobby', lobbyId);
+    }
+    
     function createLobby(event) {
         event.preventDefault(); // Prevent the default form submission
         socket.emit('createLobby', gameName); // Use the gameName state variable as the lobby name
@@ -63,7 +70,18 @@
               <label for="gameName" class="label text-xl">Name of Lobby:</label>
               <input bind:value={gameName} id="gameName" type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs" />
               <button type="submit" class="btn btn-primary m-2">Create Lobby</button>
+              {#if errMsg}
+                <p class="error-message" >{errMsg}</p>
+              {/if}
             </form>
           </div>
     </div>
 </div>
+
+<style>
+    .error-message {
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>

@@ -42,4 +42,16 @@ function getLobbies() {
     return Object.values(lobbies); // Convert the lobbies object to an array
 }
 
-module.exports = { createLobby, joinLobby, leaveLobby, getLobbies };
+function deleteLobby(socketId) {
+    Object.keys(lobbies).forEach(lobbyName => {
+        const lobby = lobbies[lobbyName];
+        if (lobby.owner === socketId) {
+            delete lobbies[lobbyName];
+        }
+    });
+
+    return Object.values(lobbies);
+}
+
+
+module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby };
