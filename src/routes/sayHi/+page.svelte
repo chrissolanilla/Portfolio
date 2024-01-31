@@ -5,12 +5,12 @@
     import "../../app.css"
   
     //reference the chat container element
-    let chatContainer;
-let autoScroll = true;
-let lastScrollTop = 0; // Variable to store the last scroll position.
-let scrollSum=100;
-let scrollSum2=100
-function onScroll() {
+  let chatContainer;
+  let autoScroll = true;
+  let lastScrollTop = 0; // Variable to store the last scroll position.
+  let scrollSum=100;
+  let scrollSum2=100
+  function onScroll() {
     const currentScrollTop = chatContainer.scrollTop;
 
     // Calculate the distance from the bottom of the chat container
@@ -31,26 +31,26 @@ function onScroll() {
 
 
 // Reactive statement to handle auto-scrolling.
-$: if (chatContainer && messages.length > 0 && autoScroll) {
-    setTimeout(() => {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }, 0);
-}
+  $: if (chatContainer && messages.length > 0 && autoScroll) {
+      setTimeout(() => {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 0);
+  }
 
 
-    let message = 'no initial message';
-    let socket;
-    let inputMessage = '';
+  let message = 'no initial message';
+  let socket;
+  let inputMessage = '';
 
-    let userName = '';
-    let registrationError = '';
-    
-    let userCount = 0; //reactive varible
-    let messages= []; //array to store messages
+  let userName = '';
+  let registrationError = '';
+  
+  let userCount = 0; //reactive varible
+  let messages= []; //array to store messages
 
-    let isRegistered = false; //add flag and set it true after regisration
+  let isRegistered = false; //add flag and set it true after regisration
 
-    if (browser) {
+  if (browser) {
     onMount(() => {
       const backendURL = import.meta.env.VITE_BACKEND_URL;
       socket = io(backendURL);
@@ -88,18 +88,18 @@ $: if (chatContainer && messages.length > 0 && autoScroll) {
   }
 
   function sendMessage() {
-  if (socket && inputMessage.trim() !== '') {
-    const messageObject = {
-      name: isRegistered ? userName : 'Guest',
-      text: inputMessage,
-      timestamp: new Date().toISOString() // Use ISO string for consistency
-    };
-    // Emit the message to the server without the 'type' property
-    socket.emit('sendMessage', messageObject);
-    // Don't push to messages array here; let the server confirm the message
-    inputMessage = '';
+    if (socket && inputMessage.trim() !== '') {
+      const messageObject = {
+        name: isRegistered ? userName : 'Guest',
+        text: inputMessage,
+        timestamp: new Date().toISOString() // Use ISO string for consistency
+      };
+      // Emit the message to the server without the 'type' property
+      socket.emit('sendMessage', messageObject);
+      // Don't push to messages array here; let the server confirm the message
+      inputMessage = '';
+    }
   }
-}
 
 // Function to handle the Enter key press event
 function handleEnterPress(event) {
