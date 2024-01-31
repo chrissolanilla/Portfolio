@@ -122,6 +122,12 @@ io.on('connection', (socket) => {
   });
 
   // Handle other events like joinLobby, leaveLobby...
+
+  socket.on('disconnect', () => {
+    const updatedLobbies = lobbyManager.deleteLobby(socket.id);
+    io.emit('lobbiesList', updatedLobbies);
+    // Other disconnect logic...
+  });
 });
 
 
