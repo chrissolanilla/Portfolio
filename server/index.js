@@ -32,11 +32,17 @@ const io = require('socket.io')(server, {
     }
   });
 
+
+// Chat Namespace
+const chat = io.of('/chat');
+let chatUserCount = 0;
+
+
 let userCount=0; //track the number of connected users. 
 const activeUsersChat = {};// add an object to keep track of the users.  for clock tower
   
 
-io.on('connection', (socket) => {
+chat.on('connection', (socket) => {
   //RealTimeChat logic
   //////////
 ///////////
@@ -97,7 +103,9 @@ io.on('connection', (socket) => {
 //
 //
 //
-io.on('connection', (socket) => {
+// Clock Namespace
+const clock = io.of('/clock');
+clock.on('connection', (socket) => {
   console.log("User Connected to Clock");
   //logic for usernames in lobby
   let userNameClock = '';
