@@ -140,7 +140,7 @@ clock.on('connection', (socket) => {
       // After successfully creating a new lobby, fetch the updated list of lobbies
       const updatedLobbies = lobbyManager.getLobbies();
       // Broadcast the updated list of lobbies to all connected clients
-      io.emit('lobbiesList', updatedLobbies);
+      clock.emit('lobbiesList', updatedLobbies);
     } else {
       // Handle error, e.g., lobby name already taken
       socket.emit('lobbyCreationFailed', 'Lobby name already taken.');
@@ -163,7 +163,7 @@ clock.on('connection', (socket) => {
         console.log('username is ', userNameClock);
         socket.emit('joinLobby', { lobbyName: lobbyName, userNameClock: userNameClock });
         // Optionally, update all clients in the lobby
-        io.to(lobbyName).emit('lobbyUpdate', {/* lobby information */});
+        clock.to(lobbyName).emit('lobbyUpdate', {/* lobby information */});
     } else {
       console.log('join was not succesful');
         // Joining the lobby was unsuccessful
@@ -174,7 +174,7 @@ clock.on('connection', (socket) => {
   socket.on('disconnect', () => {
     const disconnectTimeout = setTimeout(() => {
       const updatedLobbies = lobbyManager.deleteLobby(socket.id);
-      io.emit('lobbiesList', updatedLobbies);
+      clock.emit('lobbiesList', updatedLobbies);
       // Other disconnect logic...
     }, 10000 ); //wait ten seconds before deleting
 
