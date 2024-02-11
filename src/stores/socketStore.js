@@ -6,10 +6,9 @@ const createSocketStore = () => {
 
   return {
     subscribe,
-    connect: (backendURL) => {
-      const socket = io(backendURL);
+    connect: (backendURL, namespace = '') => {
+      const socket = io(`${backendURL}${namespace}`);
       set(socket);
-      // Handle socket events here
     },
     disconnect: () => {
       set(null);
