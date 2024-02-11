@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { browser } from '$app/environment';
     import io from 'socket.io-client';
-    import "../../app.css"
+    
   
     //reference the chat container element
   let chatContainer;
@@ -42,7 +42,7 @@
   let socket;
   let inputMessage = '';
 
-  let userName = '';
+  let userNameChat = '';
   let registrationError = '';
   
   let userCount = 0; //reactive varible
@@ -52,7 +52,7 @@
 
   if (browser) {
     onMount(() => {
-      const backendURL = import.meta.env.VITE_BACKEND_URL;
+      const backendURL = import.meta.env.VITE_BACKEND_URL;//connect to the namespace
       socket = io(backendURL);
 
       socket.on('message', (messageObject) => {
@@ -81,8 +81,8 @@
   }
 
   function registerUser() {
-    if (socket && userName.trim() !== '') {
-      socket.emit('registerUser', userName);
+    if (socket && userNameChat.trim() !== '') {
+      socket.emit('registerUser', userNameChat);
       isRegistered = true; //set the flag to true after registration
     }
   }
@@ -90,7 +90,7 @@
   function sendMessage() {
     if (socket && inputMessage.trim() !== '') {
       const messageObject = {
-        name: isRegistered ? userName : 'Guest',
+        name: isRegistered ? userNameChat : 'Guest',
         text: inputMessage,
         timestamp: new Date().toISOString() // Use ISO string for consistency
       };
@@ -109,7 +109,7 @@ function handleEnterPress(event) {
   }
 </script>
 
-<input type="text" placeholder="Enter your name" bind:value={userName}  disabled={isRegistered} class="input input-bordered input-primary w-full max-w-xs" />
+<input type="text" placeholder="Enter your name" bind:value={userNameChat}  disabled={isRegistered} class="input input-bordered input-primary w-full max-w-xs" />
 <button on:click={registerUser} disabled={isRegistered} class="btn btn-primary" >Register</button>
 {#if registrationError}
   <p style="color: red">{registrationError}</p>
@@ -141,6 +141,7 @@ function handleEnterPress(event) {
 
 
 <style>
+  @import "../../app.css" ;
   .chat-containerChris {
     display: flex;
     flex-direction: column;
@@ -189,4 +190,5 @@ function handleEnterPress(event) {
     gap: 10px;
     
   }
+  
 </style>
