@@ -52,7 +52,8 @@
 
   if (browser) {
     onMount(() => {
-      const backendURL = import.meta.env.VITE_BACKEND_URL;//connect to the namespace
+      const backendURL = import.meta.env.VITE_BACKEND_URL+'/chat';//connect to the namespace
+      console.log(backendURL); // this dosent happen? 
       socket = io(backendURL);
 
       socket.on('message', (messageObject) => {
