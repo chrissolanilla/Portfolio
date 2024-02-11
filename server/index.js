@@ -35,19 +35,16 @@ const io = require('socket.io')(server, {
 
 // Chat Namespace
 const chat = io.of('/chat');
-let chatUserCount = 0;
 
-
-let userCount=0; //track the number of connected users. 
-const activeUsersChat = {};// add an object to keep track of the users.  for clock tower
-  
+let userCountChat=0; //track the number of connected users. 
+const activeUsersChat = {};// add an object to keep track of the users. 
 
 chat.on('connection', (socket) => {
   //RealTimeChat logic
   //////////
 ///////////
     let userNameChat;
-    socket.emit('userCount', { count: Object.keys(activeUsersChat).length }) ; //send current user count immiedietly
+    socket.emit('userCountChat', { count: Object.keys(activeUsersChat).length }) ; //send current user count immiedietly
 
     socket.on('registerUser', (userNameChat) => {
       if (activeUsersChat[userNameChat]) {
@@ -56,9 +53,10 @@ chat.on('connection', (socket) => {
       } else {
           // Register the user
           activeUsersChat[userNameChat] = socket.id; // Associate userName with socket ID
+          socket.userNameChat = userNameChat;
           socket.emit('registrationSuccess', `Registered temporarily as ${userNameChat}`);
-          userCount = Object.keys(activeUsersChat).length;
-          io.emit('userCount', { count: userCount });
+          userCountChat = Object.keys(activeUsersChat).length;
+          chat.emit('userCountChat', { count: userCountChat });
       }
   });
 
@@ -82,13 +80,14 @@ chat.on('connection', (socket) => {
   });
     
     socket.on('disconnect', () => {
-        if(userNameChat){
-          delete activeUsersChat[userNameChat]; //remove the user from activeUsers
-          userCount = Object.keys(activeUsersChat).length;
-          io.emit('userCount', { count: userCount });
+        if(socket.userNameChat && activeUsersChat[socket.userNameChat]){
+          delete activeUsersChat[socket.userNameChat]; //remove the user from activeUsers
+          userCountChat = Object.keys(activeUsersChat).length;
+          chat.emit('userCountChat', { count: userCountChat });
         }
         // userCount--; //decrement the user count
         console.log('User disconnected');
+        console.log('number of users is ',userCountChat)
         // io.emit('userCount', { count: userCount })
     });
 });

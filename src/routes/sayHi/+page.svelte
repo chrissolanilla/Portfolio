@@ -1,7 +1,8 @@
 <script>
     import { onMount, onDestroy } from 'svelte';
     import { browser } from '$app/environment';
-    import io from 'socket.io-client';
+    import io from 'socket.io-client'; 
+    import { socketStore} from '../../stores/socketStore'
     
   
     //reference the chat container element
@@ -45,65 +46,73 @@
   let userNameChat = '';
   let registrationError = '';
   
-  let userCount = 0; //reactive varible
+  let userCountChat = 0; //supposed to be reactive
   let messages= []; //array to store messages
 
   let isRegistered = false; //add flag and set it true after regisration
 
   if (browser) {
     onMount(() => {
-      const backendURL = import.meta.env.VITE_BACKEND_URL+'/chat';//connect to the namespace
-      console.log(backendURL); // this dosent happen? 
-      socket = io(backendURL);
+      const backendURL = import.meta.env.VITE_BACKEND_URL; // Adjust if needed
+      socketStore.connect(backendURL, '/chat');
 
-      socket.on('message', (messageObject) => {
-        const formattedTime = new Date(messageObject.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-        messages = [...messages, { ...messageObject, time: formattedTime }];
+      const unsubscribe = socketStore.subscribe(socket => {
+        if (socket) {
+          socket.on('message', (messageObject) => {
+            const formattedTime = new Date(messageObject.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            messages = [...messages, { ...messageObject, time: formattedTime }];
+          });
+
+          socket.on('userCountChat', (data) => {
+            userCountChat = data.count;
+            console.log('Updated user count: ', userCountChat);
+          });
+
+          socket.on('registrationSuccess', (msg) => {
+            isRegistered = true;
+          });
+
+          socket.on('registrationFailed', (errorMsg) => {
+            registrationError = errorMsg;
+          });
+        }
       });
 
-      socket.on('userCount', (data) => {
-        userCount = data.count;
-      });
-
-      socket.on('registrationSuccess', (msg) => {
-        // Handle successful registration
-      });
-
-      socket.on('registrationFailed', (errorMsg) => {
-        registrationError = errorMsg; // Show error to the user
-      });
-    });
-
-    onDestroy(() => {
-      if (socket) {
-        socket.disconnect();
-      }
+      return () => {
+        unsubscribe();
+        socketStore.disconnect();
+      };
     });
   }
 
   function registerUser() {
-    if (socket && userNameChat.trim() !== '') {
-      socket.emit('registerUser', userNameChat);
-      isRegistered = true; //set the flag to true after registration
+    if (userNameChat.trim() !== '') {
+      socketStore.subscribe(socket => {
+        if (socket) {
+          socket.emit('registerUser', userNameChat);
+          console.log(userCountChat);
+        }
+      })();
     }
   }
 
   function sendMessage() {
-    if (socket && inputMessage.trim() !== '') {
-      const messageObject = {
-        name: isRegistered ? userNameChat : 'Guest',
-        text: inputMessage,
-        timestamp: new Date().toISOString() // Use ISO string for consistency
-      };
-      // Emit the message to the server without the 'type' property
-      socket.emit('sendMessage', messageObject);
-      // Don't push to messages array here; let the server confirm the message
-      inputMessage = '';
+    if (inputMessage.trim() !== '') {
+      socketStore.subscribe(socket => {
+        if (socket) {
+          const messageObject = {
+            name: isRegistered ? userNameChat : 'Guest',
+            text: inputMessage,
+            timestamp: new Date().toISOString()
+          };
+          socket.emit('sendMessage', messageObject);
+          inputMessage = '';
+        }
+      })();
     }
   }
 
-// Function to handle the Enter key press event
-function handleEnterPress(event) {
+  function handleEnterPress(event) {
     if (event.key === 'Enter') {
       sendMessage();
     }
@@ -116,7 +125,7 @@ function handleEnterPress(event) {
   <p style="color: red">{registrationError}</p>
 {/if}
 
-<h2>Users Connected: {userCount}</h2>
+<h2>Users Connected: {userCountChat}</h2>
 
 
 <!-- Chat interface -->
