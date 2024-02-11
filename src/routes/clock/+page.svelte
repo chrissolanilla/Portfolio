@@ -3,6 +3,7 @@
     import io from 'socket.io-client';
     import "../../app.css"
     import { browser } from '$app/environment';
+    import {socketStore} from '../../stores/socketStore'
 
     let errMsg = '';
     let socket;
@@ -11,28 +12,33 @@
     if(browser){
 
         onMount(() => {
-            const backendURL = import.meta.env.VITE_BACKEND_URL;
-            socket = io(backendURL);
+            const backendURL = import.meta.env.VITE_BACKEND_URL;//connect to the namespace
+            socketStore.connect(backendURL);
+            socketStore.subscribe(value => {
+                socket = value;
+                //moving all socket event listeners inside the subscribe?
+                socket = io(backendURL);
+        
+                socket.emit('getLobbies'); // Request the list of lobbies
+        
+                socket.on('lobbiesList', (receivedLobbies) => {
+                    lobbies = receivedLobbies;
+                });
     
-            socket.emit('getLobbies'); // Request the list of lobbies
-    
-            socket.on('lobbiesList', (receivedLobbies) => {
-                lobbies = receivedLobbies;
-            });
-
-            socket.on('lobbyCreated', (newLobby) => {
-                //when new lobby created make it reactive
-                lobbies = [...lobbies, newLobby];
+                socket.on('lobbyCreated', (newLobby) => {
+                    //when new lobby created make it reactive
+                    lobbies = [...lobbies, newLobby];
+                })
+        
+                // Function to join a lobby
+                
+                // Additional functions for creating lobbies, leaving lobbies, etc.
+                socket.on('lobbyCreationFailed', (message) => {
+                    errMsg = message; // Update the errorMessage with the received message
+                    // Optionally, clear the message after a delay
+                    setTimeout(() => errMsg = '', 3000); // Clears the error message after 3 seconds
+                });
             })
-    
-            // Function to join a lobby
-            
-            // Additional functions for creating lobbies, leaving lobbies, etc.
-            socket.on('lobbyCreationFailed', (message) => {
-                errMsg = message; // Update the errorMessage with the received message
-                // Optionally, clear the message after a delay
-                setTimeout(() => errMsg = '', 3000); // Clears the error message after 3 seconds
-            });
 
         });
     }
@@ -53,7 +59,7 @@
         <h1 class="m-1 text-center"><i class="fas fa-users"></i> Public Lobbies</h1>
         <div class="p-5 text-center">
             {#each lobbies as lobby}
-              <a href={`/lobby/${lobby.id}`} class="btn btn-outline btn-accent m-2">{lobby.name}</a>
+                <a href={`/lobby/${lobby.name}`} class="btn btn-outline btn-accent m-2">{lobby.name}</a>
             {/each}
           </div>
           
