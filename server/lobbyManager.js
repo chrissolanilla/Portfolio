@@ -49,27 +49,52 @@ function createLobby(socket, lobbyName, io) {
       role: "", // This can be assigned later
     });
   
-    io.to(lobbyName).emit('lobbyPlayersUpdate', { players: lobby.players });
+    // After adding the new player to the lobby
+    socket.join(lobbyName, () => {
+      // Emit to all clients in the lobby room
+      io.to(lobbyName).emit('lobbyPlayersUpdate', {
+        players: lobby.players.map(player => {
+          return {
+            userNameClock: player.userNameClock,
+            team: player.team,
+            alive: player.alive,
+            role: player.role
+          };
+        })
+      });
+    });
+
     console.log(`User ${userNameClock} successfully joined lobby ${lobbyName}:`, lobby.players);
     return true;
   }
   
 
-function leaveLobby(socket, lobbyName) {
+  function leaveLobby(socket, lobbyName) {
     const lobby = lobbies[lobbyName];
     if (lobby) {
-        lobby.players = lobby.players.filter(playerId => playerId !== socket.id);
-        // Additional leave logic...
+        // Remove the player based on their socket ID
+        lobby.players = lobby.players.filter(player => player.socketID !== socket.id);
+
+        // Emit the updated player list to all clients in the lobby
+        const updatedPlayers = lobby.players.map(player => player.userNameClock); // Extract only the usernames
+        io.to(lobbyName).emit('lobbyPlayersUpdate', { players: updatedPlayers });
+
+        // Destroy the lobby if no players are left
         if (lobby.players.length === 0) {
-        // If no players are left in the lobby, destroy it
-        delete lobbies[lobbyName];
+            delete lobbies[lobbyName];
         }
     }
 }
   
 
 function getLobbies() {
+    
     return Object.values(lobbies); // Convert the lobbies object to an array
+}
+
+function getLobbyPlayers(lobbyName){
+  console.log('the value of playesrs array is ' , Object.values(lobbies[lobbyName].players));
+  return Object.values(lobbies[lobbyName].players);
 }
 
 function deleteLobby(socketId) {
@@ -84,4 +109,4 @@ function deleteLobby(socketId) {
 }
 
 
-module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby };
+module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers };

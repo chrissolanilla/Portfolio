@@ -119,6 +119,7 @@ clock.on('connection', (socket) => {
       socket.emit('registrationFailed', 'Name is already taken in this instance');
     } else {
       userNameClock = name;
+      //i do not know why i am storing the socketID instead of their name for the users in the lobby. Should i change this? IMPORTANT
       activeUsersLobby[name] = {socketID: socket.id, lobby: lobbyName };
       socket.emit('registrationSuccess', 'Registered temporarily as ${name}');
       //debugging
@@ -126,7 +127,10 @@ clock.on('connection', (socket) => {
         const currentLobbies = lobbyManager.getLobbies();
         socket.emit('lobbiesList', currentLobbies);
         console.log("current lobbie are ", currentLobbies);
+        clock.to(lobbyName).emit('lobbyPlayersUpdate', { players: updatedPlayers });
         console.log("Did the registration successfully\n The lobby is ", currentLobbies, "did that print out ?");
+        //show or broadcast the clients the list of players in the lobby
+        //clock.emit(playesr)
       });
     }
   });
@@ -164,6 +168,13 @@ clock.on('connection', (socket) => {
         socket.emit('joinLobby', { lobbyName: lobbyName, userNameClock: userNameClock });
         // Optionally, update all clients in the lobby
         clock.to(lobbyName).emit('lobbyUpdate', {/* lobby information */});
+        //get the updated players list from lobby lobbyManager
+        const updatedPlayers = lobbyManager.getLobbyPlayers(lobbyName);
+
+        clock.to(lobbyName).emit('lobbyPlayersUpdate', {players: updatedPlayers});
+        clock.to(lobbyName).emit('lobbyPlayersUpdate', {players: updatedPlayers})
+        console.log('upadted Players is ', updatedPlayers);
+
     } else {
       console.log('join was not succesful');
         // Joining the lobby was unsuccessful
