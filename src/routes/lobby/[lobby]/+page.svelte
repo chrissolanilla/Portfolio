@@ -2,26 +2,32 @@
     import { onMount } from 'svelte';
     import { socketStore } from '../../../stores/socketStore.js'
     import { page } from '$app/stores';
+    import { writable } from 'svelte/store';
     let lobbyName='';
     let socket;
     let userNameClock = '';
     let isRegistered = false;
     let registrationError = false;
-    let players = [];
+    let players = writable([]);
+    
+    
 
     onMount(() => {
-      lobbyName = $page.params.lobby;
-      socketStore.subscribe(value => {
-          socket = value;
-          if (socket) {
-              socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers }) => {
-                console.log('testing if this code runs after lobbyPlayersUpdate');
-                  // Map over the updatedPlayers array to extract only the usernames
-                  players = updatedPlayers.map(player => player.userNameClock);
-              });
-          }
-      });
-  });
+        lobbyName = $page.params.lobby;
+        const backendURL = import.meta.env.VITE_BACKEND_URL+'/clock';//connect to the namespace
+        console.log(backendURL);
+        socketStore.connect(backendURL);
+        socketStore.subscribe(value => {
+            socket = value;
+            if (socket) {
+                socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers }) => {
+                    console.log('Updated players:', updatedPlayers);
+                    console.log('testing if this runs')
+                    players.set(updatedPlayers); // Trigger reactivity by assigning a new array
+                });
+            }
+        });
+    });
 
     
     function registerUser() {
@@ -40,6 +46,9 @@
                 registrationError = errorMsg;
             });
         }
+
+        //this adds the username from the input to the lobby but it dosent add it for everyone, i also want to get the entire object from the server instead also. 
+        
     }
 
 
@@ -51,6 +60,19 @@
         }
     }
 
+    function getPlayers() {
+        let currentPlayers;
+        players.subscribe(value => {
+            currentPlayers = value;
+        })(); // Immediately invoke the function returned by subscribe to unsubscribe
+        console.log(currentPlayers);
+    }
+
+    $: console.log($players);
+    function testIfReacts() {
+      players.set('test')
+      console.log('putting something in the first slot of the array')
+    }
   </script>
 <h1>Welcome to {lobbyName}'s Lobby</h1>
 
@@ -62,8 +84,10 @@
 
 <h2>Players in Lobby:</h2>
 <ul>
-  {#each players as player}
-    <li>{player}</li>
+  {#each $players as player}
+  <li>{player.userNameClock} - Alive: {player.alive ? 'Yes' : 'No'}, Role: {player.role}</li>
   {/each}
 </ul>
+<button on:click={getPlayers}> test value of players array</button>
+<button on:click={testIfReacts}>Test if the players react. </button>
 
