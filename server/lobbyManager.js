@@ -93,8 +93,15 @@ function getLobbies() {
 }
 
 function getLobbyPlayers(lobbyName){
-  console.log('the value of playesrs array is ' , Object.values(lobbies[lobbyName].players));
-  return Object.values(lobbies[lobbyName].players);
+  const lobby = lobbies[lobbyName];
+  if (lobby && lobby.players) {
+    console.log('the value of playesrs array is ' , lobby.players);
+    return lobby.players;
+  }
+  else {
+    return [];
+  }
+  // return Object.values(lobbies[lobbyName].players);
 }
 
 function deleteLobby(socketId) {
@@ -108,5 +115,9 @@ function deleteLobby(socketId) {
     return Object.values(lobbies);
 }
 
+function retrieveLobbyNameFromSocket(socket) {
+  return socket.handshake.query.lobbyName;
+}
 
-module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers };
+
+module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket};
