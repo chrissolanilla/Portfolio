@@ -30,8 +30,7 @@
                     //when new lobby created make it reactive
                     lobbies = [...lobbies, newLobby];
                 })
-        
-                // Function to join a lobby
+                
                 
                 // Additional functions for creating lobbies, leaving lobbies, etc.
                 socket.on('lobbyCreationFailed', (message) => {

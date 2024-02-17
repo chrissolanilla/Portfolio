@@ -106,6 +106,26 @@ chat.on('connection', (socket) => {
 const clock = io.of('/clock');
 clock.on('connection', (socket) => {
   console.log("User Connected to Clock");
+
+  //logic for getting the current lobbyname connected on
+  let currentLobby = lobbyManager.retrieveLobbyNameFromSocket(socket); //how to implement this? 
+  if(currentLobby){
+    socket.join(currentLobby, () => {
+      const lobby = lobbyManager.getLobbyPlayers(currentLobby);//need to implement this
+      if(lobby){
+        socket.emit('lobbyPlayersUpdate', {
+          players: lobby.players.map(player => {
+            return {
+              userNameClock: player.userNameClock,
+              team: player.team,
+              alive: player.alive,
+              role:player.role
+            }
+          })
+        })
+      }
+    })
+  }
   //logic for usernames in lobby
   let userNameClock = '';
   const activeUsersLobby = {};// add an object to keep track of the users. 
@@ -151,6 +171,12 @@ clock.on('connection', (socket) => {
     }
   });
 
+  socket.on('requestCurrentLobbyState', ({ lobbyName }) => {
+    const players = lobbyManager.getLobbyPlayers(lobbyName);
+    if(players) {
+      socket.emit('lobbyPlayersUpdate', { players });
+    }
+  })
 
 
   socket.on('getLobbies', () => { // Remove the 'socket' parameter here

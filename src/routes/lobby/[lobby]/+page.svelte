@@ -20,6 +20,9 @@
         socketStore.subscribe(value => {
             socket = value;
             if (socket) {
+                //requst the current players when connecting to the page
+                socket.emit('requestCurrentLobbyState', ({ lobbyName }));
+                //update when we register
                 socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers }) => {
                     console.log('Updated players:', updatedPlayers);
                     console.log('testing if this runs')
@@ -85,9 +88,8 @@
 <h2>Players in Lobby:</h2>
 <ul>
   {#each $players as player}
-  <li>{player.userNameClock} - Alive: {player.alive ? 'Yes' : 'No'}, Role: {player.role}</li>
+  <li>{player.userNameClock} - Alive: {player.alive ? 'Yes' : 'No'}, Role: {player.role} ?</li>
   {/each}
 </ul>
-<button on:click={getPlayers}> test value of players array</button>
-<button on:click={testIfReacts}>Test if the players react. </button>
+
 
