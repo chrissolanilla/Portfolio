@@ -3,14 +3,14 @@
     import { socketStore } from '../../../stores/socketStore.js'
     import { page } from '$app/stores';
     import { writable } from 'svelte/store';
+    import GameCanvas from '$lib/GameCanvas.svelte'
     let lobbyName='';
     let socket;
     let userNameClock = '';
     let isRegistered = false;
     let registrationError = false;
     let players = writable([]);
-    
-    
+    let gameStartedVar = false;
 
     onMount(() => {
         lobbyName = $page.params.lobby;
@@ -20,7 +20,7 @@
         socketStore.subscribe(value => {
             socket = value;
             if (socket) {
-                //requst the current players when connecting to the page
+                //requst the current players when connecting to the page and also get the varible of gameStarted
                 socket.emit('requestCurrentLobbyState', ({ lobbyName }));
                 //update when we register
                 socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers }) => {
@@ -28,6 +28,10 @@
                     console.log('testing if this runs')
                     players.set(updatedPlayers); // Trigger reactivity by assigning a new array
                 });
+
+                socket.on('gameStarted', ({ gameStarted}) => {
+                    gameStartedVar = gameStarted
+                })
             }
         });
     });
@@ -71,10 +75,15 @@
         console.log(currentPlayers);
     }
 
-    $: console.log($players);
-    function testIfReacts() {
-      players.set('test')
-      console.log('putting something in the first slot of the array')
+    function startGame(){
+        if(socket) {
+            //emit even tot send to server
+            socket.emit('startGame', { lobbyName});
+        }
+    }
+
+    function getGameStarted(){
+        console.log(gameStartedVar)
     }
   </script>
 <h1>Welcome to {lobbyName}'s Lobby</h1>
@@ -91,5 +100,14 @@
   <li>{player.userNameClock} - Alive: {player.alive ? 'Yes' : 'No'}, Role: {player.role} ?</li>
   {/each}
 </ul>
+<!--check if the player name matches the host of the lobby-->
+{#if userNameClock }
+    <button class="btn btn-secondary" on:click={startGame}> Start Game</button>
+{/if}
+{#if gameStartedVar}
+    <GameCanvas />
+{/if}
+<button class="btn btn-primary" on:click={getGameStarted}>Get Game</button>
+
 
 

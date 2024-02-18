@@ -173,9 +173,15 @@ clock.on('connection', (socket) => {
 
   socket.on('requestCurrentLobbyState', ({ lobbyName }) => {
     const players = lobbyManager.getLobbyPlayers(lobbyName);
+    const gameStarted= lobbyManager.getGameStarted(lobbyName);
     if(players) {
-      socket.emit('lobbyPlayersUpdate', { players });
+      socket.emit('lobbyPlayersUpdate', { players, gameStarted });
     }
+  })
+
+  socket.on('startGame', ({ lobbyName }) => {
+    lobbyManager.startGame(lobbyName);
+    clock.to(lobbyName).emit('gameStarted', {gameStarted: true});
   })
 
 
