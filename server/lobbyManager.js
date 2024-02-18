@@ -47,6 +47,9 @@ function createLobby(socket, lobbyName, io) {
       team: "", // This can be assigned later
       alive: true,
       role: "", // This can be assigned later
+      x: "",
+      y: "",
+      avatar: 'default.svg'
     });
   
     // After adding the new player to the lobby
@@ -58,7 +61,10 @@ function createLobby(socket, lobbyName, io) {
             userNameClock: player.userNameClock,
             team: player.team,
             alive: player.alive,
-            role: player.role
+            role: player.role,
+            x:player.x,
+            y: player.y,
+            avatar: player.avatar
           };
         })
       });
