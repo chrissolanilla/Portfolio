@@ -112,7 +112,7 @@
     <button class="btn btn-secondary" on:click={startGame}> Start Game</button>
 {/if}
 {#if gameStartedVar}
-    <GameCanvas />
+    <GameCanvas players={$players} />
 {/if}
 <button class="btn btn-primary" on:click={getGameStarted}>Get Game</button>
 
