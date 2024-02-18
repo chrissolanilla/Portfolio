@@ -82,10 +82,6 @@
             socket.emit('startGame', { lobbyName});
         }
     }
-
-    function getGameStarted(){
-        console.log(gameStartedVar)
-    }
   </script>
 <h1>Welcome to {lobbyName}'s Lobby</h1>
 
@@ -114,7 +110,7 @@
 {#if gameStartedVar}
     <GameCanvas players={$players} />
 {/if}
-<button class="btn btn-primary" on:click={getGameStarted}>Get Game</button>
+
 
 
 
