@@ -119,5 +119,19 @@ function retrieveLobbyNameFromSocket(socket) {
   return socket.handshake.query.lobbyName;
 }
 
+function getGameStarted(lobbyName){
+  const lobby = lobbies[lobbyName];
+    if (lobby) {
+        return lobby.gameStarted;
+    } else {
+        return false; // Default to false if the lobby doesn't exist
+    }
+}
 
-module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket};
+function startGame(lobbyName) {
+  if (lobbies[lobbyName]) {
+      lobbies[lobbyName].gameStarted = true;
+  }
+}
+
+module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket, getGameStarted, startGame};
