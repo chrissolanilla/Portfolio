@@ -89,11 +89,17 @@
   </script>
 <h1>Welcome to {lobbyName}'s Lobby</h1>
 
-<input type="text" placeholder="Enter your name" bind:value={userNameClock} disabled={isRegistered} class="input input-bordered input-primary w-full max-w-xs" />
-<button on:click={registerUser} disabled={isRegistered} class="btn btn-primary">Join Lobby with User Name</button>
-{#if registrationError}
-  <p style="color: red">{registrationError}</p>
+{#if !gameStartedVar}
+    <input type="text" placeholder="Enter your name" bind:value={userNameClock} disabled={isRegistered} class="input input-bordered input-primary w-full max-w-xs" />
+    <button on:click={registerUser} disabled={isRegistered} class="btn btn-primary">Join Lobby with User Name</button>
+    {#if registrationError}
+    <p style="color: red">{registrationError}</p>
+    {/if}
+    {:else}
+    <h1>Game has started</h1>
+
 {/if}
+
 
 <h2>Players in Lobby:</h2>
 <ul>
@@ -102,7 +108,7 @@
   {/each}
 </ul>
 <!--check if the player name matches the host of the lobby-->
-{#if userNameClock }
+{#if userNameClock && !gameStartedVar }
     <button class="btn btn-secondary" on:click={startGame}> Start Game</button>
 {/if}
 {#if gameStartedVar}
