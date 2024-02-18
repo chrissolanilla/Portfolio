@@ -23,10 +23,11 @@
                 //requst the current players when connecting to the page and also get the varible of gameStarted
                 socket.emit('requestCurrentLobbyState', ({ lobbyName }));
                 //update when we register
-                socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers }) => {
+                socket.on('lobbyPlayersUpdate', ({ players: updatedPlayers , gameStarted }) => {
                     console.log('Updated players:', updatedPlayers);
                     console.log('testing if this runs')
                     players.set(updatedPlayers); // Trigger reactivity by assigning a new array
+                    gameStartedVar = gameStarted
                 });
 
                 socket.on('gameStarted', ({ gameStarted}) => {
