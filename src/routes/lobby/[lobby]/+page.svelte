@@ -11,6 +11,7 @@
     let registrationError = false;
     let players = writable([]);
     let gameStartedVar = false;
+    let currentUserNameClock = '';
 
     onMount(() => {
         lobbyName = $page.params.lobby;
@@ -47,6 +48,7 @@
             socket.once('registrationSuccess', () => {
                 isRegistered = true;
                 joinLobby(); // Call joinLobby only after successful registration
+                currentUserNameClock = userNameClock;
             });
 
             // Optionally, listen for a registration failure response to handle errors
@@ -107,10 +109,18 @@
 {#if userNameClock && !gameStartedVar }
     <button class="btn btn-secondary" on:click={startGame}> Start Game</button>
 {/if}
-{#if gameStartedVar}
-    <GameCanvas players={$players} />
-{/if}
+<div class='gamecanvas'>
 
+    {#if gameStartedVar}
+        <GameCanvas players={$players} {socket} {currentUserNameClock} {lobbyName}/>
+    {/if}
+</div>
+ <style>
+    .gamecanvas {
+        margin: auto;
+        left: 80%;
+    }
+ </style>
 
 
 
