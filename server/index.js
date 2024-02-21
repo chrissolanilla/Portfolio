@@ -179,6 +179,29 @@ clock.on('connection', (socket) => {
     }
   })
 
+  socket.on('playerMoved', ({ id, x, y, lobbyName }) => {
+    // const lobbyName = lobbyManager.retrieveLobbyNameFromSocket(socket);
+    console.log(lobbyName, 'is the name of the lobby')
+    const lobbies = lobbyManager.getLobbies();
+    const lobby = lobbies.find(lobby => lobby.name === lobbyName);
+    console.log('our lobby is ', lobby);
+    console.log('the lobbies are',lobbies)
+    if(!lobby){
+      console.log('no lobby, returning');
+      return;
+    }
+    const player = lobby.players.find(player => player.userNameClock === id);
+    if(!player){
+      console.log('no player, returning');
+      return;
+    }
+    //update player positions
+    player.x = x;
+    player.y = y;
+    //boradcast the player postion to all clients in lobby
+    clock.to(lobbyName).emit('updatePlayerPosition', {id, x, y });
+  })
+
   socket.on('startGame', ({ lobbyName }) => {
     lobbyManager.startGame(lobbyName);
     clock.to(lobbyName).emit('gameStarted', {gameStarted: true});

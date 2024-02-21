@@ -1,9 +1,3 @@
-// players: { //give them attributes like their name, team, alive status, and role. 
-//   userName:"",
-//   team: "",// could be either red blue, or green. The game decides the teams once it starts and all players have joined. 
-//   alive: true, //everyone is alive at first, they can die later as the game goes on
-//   role: "", //roles are decided once game starts and all players have joined. 
-// }, 
 const lobbies = {};
 function createLobby(socket, lobbyName, io) {
     // Check if the lobby name already exists
@@ -49,7 +43,7 @@ function createLobby(socket, lobbyName, io) {
       role: "", // This can be assigned later
       x: "",
       y: "",
-      avatar: 'default.svg'
+      avatar: '/default.svg'
     });
   
     // After adding the new player to the lobby
