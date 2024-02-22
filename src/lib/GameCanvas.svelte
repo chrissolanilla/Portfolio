@@ -8,8 +8,7 @@
   
     let canvas;
     let ctx;
-    let x=0;
-    let y=0;
+
 
   
     onMount(() => {
@@ -19,11 +18,19 @@
       socket.on('updatePlayerPosition', ({id, x, y}) => {
         const playerIndex = players.findIndex(player => player.userNameClock === id);
         if (playerIndex === -1) return;
+        console.log(`Updating position for ${id}: x=${x}, y=${y}`);
         players[playerIndex].x = x;
         players[playerIndex].y  = y;
 
         redrawCanvas();
       })
+      //get starting possitons
+      socket.on('initializePlayers', (playersData) => {
+        console.log('Received initializePlayers:', playersData); //this does not run
+        players = playersData; //update the local player array with the positions
+        redrawCanvas();
+      });
+      console.log('Client ready and listeninig for initializePlayers event') //this runs
       // Listen for keyboard events to move the player
       window.addEventListener('keydown', handleKeyDown);
   
@@ -39,6 +46,19 @@
       background.onload = () => {
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
       };
+    }
+
+    function spawnPlayers(players, canvasWidth, canvasHeight) {
+      const centerX = canvasWidth/2;
+      const centerY = canvasHeight/2;
+      const radius = 100;// adjust this if needed
+      players.forEach( (player, index) => {
+        const totalPlayers = player.length;
+        const angle = (index / totalPlayers) * 2 * Math.PI; 
+
+        player.x = centerX + radius * Math.cos(angle);
+        player.y = centerY + radius * Math.sin(angle);
+      })
     }
   
     function drawPlayers() {
@@ -61,23 +81,19 @@
       switch (event.key) {
         case 'ArrowUp':
         case 'w':
-          y -= movementSpeed;
-          currentPlayer.y = y;
+          currentPlayer.y -=movementSpeed;
           break;
         case 'ArrowDown':
         case 's':
-          y += movementSpeed;
-          currentPlayer.y = y;
+          currentPlayer.y += movementSpeed;
           break;
         case 'ArrowLeft':
         case 'a':
-          x -= movementSpeed;
-          currentPlayer.x =x;
+          currentPlayer.x -= movementSpeed;
           break;
         case 'ArrowRight':
         case 'd':
-          x += movementSpeed;
-          currentPlayer.x = x
+          currentPlayer.x += movementSpeed
           break;
       }
 
@@ -88,6 +104,7 @@
     }
   
     function redrawCanvas() {
+      console.log('Redrawing canvas with players:', players);
       ctx.clearRect(0, 0, canvas.width, canvas.height); 
       drawBackground();
       drawPlayers(); 
