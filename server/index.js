@@ -203,7 +203,7 @@ clock.on('connection', (socket) => {
   })
 
   socket.on('startGame', ({ lobbyName }) => {
-    lobbyManager.startGame(lobbyName);
+    lobbyManager.startGame(lobbyName, io, 0);
     clock.to(lobbyName).emit('gameStarted', {gameStarted: true});
   })
 

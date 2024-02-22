@@ -41,8 +41,8 @@ function createLobby(socket, lobbyName, io) {
       team: "", // This can be assigned later
       alive: true,
       role: "", // This can be assigned later
-      x: "",
-      y: "",
+      x: 100,
+      y: 100,
       avatar: '/default.svg'
     });
   
@@ -128,10 +128,29 @@ function getGameStarted(lobbyName){
     }
 }
 
-function startGame(lobbyName) {
-  if (lobbies[lobbyName]) {
-      lobbies[lobbyName].gameStarted = true;
-  }
+function startGame(lobbyName, io, flag) {
+  const lobby = lobbies[lobbyName];
+    if (!lobby) return;
+    const centerX = 850; // Half of your canvas width
+    const centerY = 540; // Half of your canvas height
+    const radius = 100; // Adjust based on your needs
+    console.log('Starting game in lobby:', lobbyName);
+    lobby.players.forEach((player, index, playersArray) => {
+        const angle = (index / playersArray.length) * 2 * Math.PI;
+        player.x = centerX + radius * Math.cos(angle);
+        player.y = centerY + radius * Math.sin(angle);
+        console.log(`Initial position for ${player.userNameClock}: x=${player.x}, y=${player.y}`);
+    });
+    lobby.gameStarted = true;
+    // Now you need to emit these positions to all clients in the lobby
+    io.of('/clock').to(lobbyName).emit('initializePlayers', lobby.players);
+    console.log(`Emitted initializePlayers for lobby: ${lobbyName}`);
+    if(flag===0){
+      setTimeout( () => {
+        startGame(lobbyName, io, 1)
+      },10000)
+    }
+    else return
 }
 
 module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket, getGameStarted, startGame};
