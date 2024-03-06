@@ -8,6 +8,7 @@
   
     let canvas;
     let ctx;
+    let clientRole = '';
 
 
   
@@ -34,9 +35,14 @@
       // Listen for keyboard events to move the player
       window.addEventListener('keydown', handleKeyDown);
   
+      socket.on('roleAssigned', ({ role, team }) => {
+        console.log('Role:', role, 'Team: ', team);
+        clientRole = role;
+      })
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
+
 
     });
   
@@ -112,4 +118,5 @@
   </script>
   
   <canvas bind:this={canvas} width="1700 " height="1080"></canvas> <!-- Adjust size as needed -->
+  <h1> your role is {clientRole}.</h1>
   
