@@ -13,7 +13,7 @@
 
         onMount(() => {
             const backendURL = import.meta.env.VITE_BACKEND_URL+'/clock';//connect to the namespace
-            console.log(backendURL);// this does not go off
+            console.log(backendURL);
             socketStore.connect(backendURL);
             socketStore.subscribe(value => {
                 socket = value;

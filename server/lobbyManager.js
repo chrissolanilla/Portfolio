@@ -11,6 +11,7 @@ function createLobby(socket, lobbyName, io) {
       owner: socket.id,
       players: [],//initialize as empty first
       gameStarted: false,
+      day: 0,
     };
     io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
     return lobbyName; // Return the lobby name as its unique identifier
@@ -43,7 +44,8 @@ function createLobby(socket, lobbyName, io) {
       role: "", // This can be assigned later
       x: 100,
       y: 100,
-      avatar: '/default.svg'
+      avatar: '/default.svg',
+      socketID: socket.id// may need to store this for showing each player their specific role. 
     });
   
     // After adding the new player to the lobby
@@ -128,9 +130,38 @@ function getGameStarted(lobbyName){
     }
 }
 
+function assignRoles(players) {
+  const shuffledPlayers= players.sort( () => 0.5 - Math.random() );
+  //assign the leviathan and goblin role to the first two players and the rest specific roles maybe. Maybe change this function later by passing in a ruleset.
+  shuffledPlayers[0].role = 'Leviathan';
+  shuffledPlayers[0].team = 'EvilTeam'
+  shuffledPlayers[1].role = 'Goblin';
+  shuffledPlayers[1.].team = 'EvilTeam';
+  //assign the Good roles to the rest of the players, each role needs to be different but for now give them a default role. 
+  for (let i = 2; i< shuffledPlayers.length; i++){
+    shuffledPlayers[i].role = 'Good';
+    shuffledPlayers[i].team = 'GoodTeam'
+  }
+
+  return shuffledPlayers;
+}
+
 function startGame(lobbyName, io, flag) {
   const lobby = lobbies[lobbyName];
     if (!lobby) return;
+
+    //assign the roles for the players
+    lobby.players = assignRoles(lobby.players);
+    //emit the roles to the players
+    lobby.players.forEach(player => {
+      const playerSocket = io.of('/clock').sockets.get(player.socketID);
+      if(playerSocket){
+        playerSocket.emit('roleAssigned', {
+          role: player.role,
+          team: player.team
+        });
+      }
+    });
     const centerX = 850; // Half of your canvas width
     const centerY = 540; // Half of your canvas height
     const radius = 100; // Adjust based on your needs
