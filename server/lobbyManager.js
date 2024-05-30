@@ -12,6 +12,10 @@ function createLobby(socket, lobbyName, io) {
       players: [],//initialize as empty first
       gameStarted: false,
       day: 0,
+      isNight: false,
+      nominations: [],
+      votes: {}, 
+      votingInProgress: false,
     };
     io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
     return lobbyName; // Return the lobby name as its unique identifier
@@ -173,15 +177,88 @@ function startGame(lobbyName, io, flag) {
         console.log(`Initial position for ${player.userNameClock}: x=${player.x}, y=${player.y}`);
     });
     lobby.gameStarted = true;
+    lobby.isNight = true; //start with night time 
+    lobby.day = 1; //start with day 1.
+
     // Now you need to emit these positions to all clients in the lobby
     io.of('/clock').to(lobbyName).emit('initializePlayers', lobby.players);
     console.log(`Emitted initializePlayers for lobby: ${lobbyName}`);
+    startDayNightCycle(lobbyName, io);
+    //this recursive thing is so that the server has time to put the players all the spots. 
     if(flag===0){
       setTimeout( () => {
         startGame(lobbyName, io, 1)
-      },10000)
+      },30000)
     }
     else return
 }
 
-module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket, getGameStarted, startGame};
+function startDayNightCycle(lobbyName, io){
+  const lobby = lobbies[lobbyName];
+  if (!lobby || !lobby.gameStarted) return; //return if there is no lobby or if it is not started. 
+  // toggle between night and day
+  lobby.isNight = !lobby.isNight; 
+  //if its day increment the day count 
+  if(!lobby.isNight){
+    lobby.day++;
+    console.log(lobby.day)
+    //check for a game end condition
+    if(lobby.day > 6) {
+      //end game logic
+      io.of('/clock').to(lobbyName).emit('gameEnd', { winner: 'Determine winner here..'});// the winner should be either the good or bad team.
+      return;
+      //bad team should win if two good players are dead. 
+    }
+  }
+  //broadcast the update to all clients in the lobby]
+  io.of('/clock').to(lobbyName).emit('dayNightUpdate', {
+    isNight: lobby.isNight,
+    day: lobby.day
+  });
+  //continue the cycle after a delay 
+  setTimeout(() => {
+        startDayNightCycle(lobbyName, io);
+    }, 10000); // 10 seconds for each day/night cycle, adjust as needed
+  }
+
+  function nominatePlayer( lobbyName, nominator, nominee) {
+    const lobby = lobbies[lobbyName];
+    if(!lobby || lobby.phase !== 'nomination') return;
+     //ensure nominee hasnt been nominated this day already
+     if(lobby.nominations.include(nominee)) {
+      return { success: false, message: 'Player already nominated' };
+     }
+     //broad cast the nomination for voting
+     lobby.nominations.push({nominator, nominee});
+     io.of('/clock').to(lobbyName).emit('nomination', { nominator, nominee });
+     //start voting period
+     lobby.votingInProgress = true;
+     setTimeout( () => {
+      tallyVotes(lobbyName);
+      lobby.votingInProgress = false;
+     }, 30000); //30 second voting time.
+  }
+
+  function vote(lobbyName, voter, voteFor){
+    const lobby = lobbies[lobbyName];
+    if (!lobby || lobby.phase !== 'voting') return;
+    //vote logic
+    lobby.votes[voter] = voteFor; 
+    //check if all votes are in to tally
+    if(Object.keys(lobby.votes).length === lobby.players.length) {
+      tallyVotes(lobbyName);
+    }
+  }
+
+  function tallyVotes(lobbyName) {
+    const lobby = lobbies[lobbyName];
+    //some tally logic
+
+    //broadcast results 
+    io.of('/clock').to(lobbyName).emit('votingResults', results);
+    //transcription to night or next phase
+
+  }
+
+
+module.exports = { createLobby, joinLobby, leaveLobby, getLobbies, deleteLobby, getLobbyPlayers, retrieveLobbyNameFromSocket, getGameStarted, startGame, nominatePlayer, vote};

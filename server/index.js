@@ -237,6 +237,16 @@ clock.on('connection', (socket) => {
       }
   });
 
+  socket.on('nominate', ({lobbyName, nominator, nominee }) => {
+    const result = lobbyManager.nominatePlayer(lobbyName, nominator, nominee);
+    //handle the result and send the confirmatino or error message back. 
+  });
+
+  socket.on('vote', ({lobbyName, voter, voteFor}) => {
+    lobbyManager.vote(lobbyName, voter, voteFor);
+    //maybe send a confiration back
+  });
+
   socket.on('disconnect', () => {
     const disconnectTimeout = setTimeout(() => {
       const updatedLobbies = lobbyManager.deleteLobby(socket.id);
