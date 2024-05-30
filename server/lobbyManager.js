@@ -101,7 +101,7 @@ function getLobbies() {
 function getLobbyPlayers(lobbyName){
   const lobby = lobbies[lobbyName];
   if (lobby && lobby.players) {
-    console.log('the value of playesrs array is ' , lobby.players);
+    // console.log('the value of playesrs array is ' , lobby.players);
     return lobby.players;
   }
   else {
