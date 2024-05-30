@@ -63,7 +63,7 @@ chat.on('connection', (socket) => {
 
     // userCount++; //increment user userCount
     // io.emit('userCount', { count: userCount }); //emit the count to all
-    console.log('A user connected');
+    // console.log('A user connected');
     
     socket.on('sendMessage', (messageObject) => {
       console.log('Message from client:', messageObject);
@@ -181,11 +181,11 @@ clock.on('connection', (socket) => {
 
   socket.on('playerMoved', ({ id, x, y, lobbyName }) => {
     // const lobbyName = lobbyManager.retrieveLobbyNameFromSocket(socket);
-    console.log(lobbyName, 'is the name of the lobby')
+    // console.log(lobbyName, 'is the name of the lobby')
     const lobbies = lobbyManager.getLobbies();
     const lobby = lobbies.find(lobby => lobby.name === lobbyName);
-    console.log('our lobby is ', lobby);
-    console.log('the lobbies are',lobbies)
+    // console.log('our lobby is ', lobby);
+    // console.log('the lobbies are',lobbies)
     if(!lobby){
       console.log('no lobby, returning');
       return;
@@ -211,7 +211,7 @@ clock.on('connection', (socket) => {
   socket.on('getLobbies', () => { // Remove the 'socket' parameter here
     const currentLobbies = lobbyManager.getLobbies();
     socket.emit('lobbiesList', currentLobbies);
-    console.log("current lobbie are ", currentLobbies);
+    // console.log("current lobbie are ", currentLobbies);
   });
 
   socket.on('joinLobby', ({ lobbyName, userNameClock }) => {
