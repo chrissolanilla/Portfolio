@@ -64,7 +64,7 @@
     let window_width = window.innerWidth;
     canvas.width = window_width / 1.2;
     canvas.height = window_height;
-    drawBackground();
+    drawBackground(canvas);
     drawPlayers();
 
     // WebSocket stuff
@@ -75,7 +75,7 @@
       players[playerIndex].xC = x;
       players[playerIndex].yC = y;
 
-      redrawCanvas();
+      redrawCanvas(canvas);
     });
 
     // Get starting positions
@@ -90,7 +90,7 @@
         playerData.avatar, 
         playerData.socketID
       ));
-      redrawCanvas();
+      redrawCanvas(canvas);
     });
 
     console.log('Client ready and listening for initializePlayers event');
@@ -105,7 +105,7 @@
 
     socket.on('dayNightUpdate', ({ isNight, day }) => {
       dayOrNight = isNight ? 'Night' : 'Day';
-      redrawCanvas();
+      redrawCanvas(canvas);
     });
 
     socket.on('nomination', (data) => {
@@ -137,7 +137,8 @@
 
   function updatePlayerPosition() {
     const currentPlayer = players.find(player => player.userNameClock === currentUserNameClock);
-    if (!currentPlayer) return;
+    //do not move if there is no player or if they are not a Player object
+    if (!currentPlayer || !(currentPlayer instanceof Player)) return;
 
     if (keysPressed.has('ArrowUp') || keysPressed.has('w')) {
       currentPlayer.move('up');
@@ -153,7 +154,7 @@
     }
 
     socket.emit('playerMoved', { id: currentPlayer.userNameClock, x: currentPlayer.xC, y: currentPlayer.yC, lobbyName });
-    redrawCanvas();
+    redrawCanvas(canvas);
   }
 
   function nominate() {
@@ -161,7 +162,7 @@
     showNominationModal = false;
   }
 
-  function drawBackground() {
+  function drawBackground(canvas) {
     const background = new Image();
     background.src = '/background.png';
     background.onload = () => {
@@ -178,10 +179,10 @@
     }
   }
 
-  function redrawCanvas() {
+  function redrawCanvas(canvas) {
     console.log('Redrawing canvas with players:', players);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground();
+    drawBackground(canvas);
     drawPlayers();
   }
 
@@ -208,7 +209,11 @@
   </div>
 {/if}
 <canvas id="canvas"></canvas>
-
+<footer>
+  <div class="footercontainer">
+      <h3>Like my webiste? Connect with me on LinkedIn! </h3>
+  </div>
+</footer>
 <style lang="postcss">
   @font-face {
     font-family: 'CloisterBlack';
