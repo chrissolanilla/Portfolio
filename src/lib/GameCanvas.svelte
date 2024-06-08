@@ -8,8 +8,6 @@
     export let currentUserNameClock;
     /** @type {string} */
     export let lobbyName;
-    /** @type {HTMLCanvasElement} */
-    let canvas;
     /** @type {CanvasRenderingContext2D} */
     let ctx;
     let clientRole = "";
@@ -92,6 +90,12 @@
     }
 
     onMount(() => {
+        /** @type {HTMLCanvasElement} */
+        let canvas = document.getElementById("canvas");
+        let windowWidth = window.innerWidth;
+        let windowHeight = window.innerHeight;
+        canvas.width = windowWidth / 1.2;
+        canvas.height = windowHeight;
         ctx = canvas.getContext("2d");
         if (!ctx) {
             console.error("Failed to get canvas context");
@@ -145,11 +149,21 @@
     });
 </script>
 
-<canvas
-    bind:this={canvas}
-    width="1700"
-    height="1080"
-    style="border: 1px solid black;"
-></canvas>
+<canvas id="canvas"></canvas>
 <h1>your role is {clientRole}.</h1>
+
+<footer>
+    <div class="footercontainer">
+        <h2>This is my footer</h2>
+    </div>
+</footer>
+
+<style>
+    canvas {
+        margin: 0 auto;
+        margin-bottom: 3rem;
+        margin-top: 3rem;
+        border: 5px;
+    }
+</style>
 
