@@ -241,8 +241,8 @@ function assignRoles(players) {
 
     return shuffledPlayers;
 }
+export default {
 
-module.exports = {
     createLobby,
     joinLobby,
     leaveLobby,
@@ -252,5 +252,16 @@ module.exports = {
     retrieveLobbyNameFromSocket,
     getGameStarted,
     startGame,
-};
+}
+// module.exports = {
+//     createLobby,
+//     joinLobby,
+//     leaveLobby,
+//     getLobbies,
+//     deleteLobby,
+//     getLobbyPlayers,
+//     retrieveLobbyNameFromSocket,
+//     getGameStarted,
+//     startGame,
+// };
 

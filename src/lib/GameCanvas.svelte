@@ -17,8 +17,10 @@
     backgroundImage.src = "/background.png";
 
     const avatars = {}; // Store preloaded avatars
-
+    /** @type {null | {x: number, y: number}} */
+    let lastPosition = { x: null, y: null };
     function gameLoop() {
+        let positionChagned = false;
         if (window.heldKeys) {
             const currentPlayer = players.find(
                 (player) => player.userNameClock === currentUserNameClock,
@@ -26,22 +28,29 @@
             if (currentPlayer) {
                 if (window.heldKeys["w"]) {
                     currentPlayer.y -= movementSpeed;
+                    positionChagned = true;
                 }
                 if (window.heldKeys["s"]) {
                     currentPlayer.y += movementSpeed;
+                    positionChagned = true;
                 }
                 if (window.heldKeys["a"]) {
                     currentPlayer.x -= movementSpeed;
+                    positionChagned = true;
                 }
                 if (window.heldKeys["d"]) {
                     currentPlayer.x += movementSpeed;
+                    positionChagned = true;
                 }
-                socket.emit("playerMoved", {
-                    id: currentPlayer.userNameClock,
-                    x: currentPlayer.x,
-                    y: currentPlayer.y,
-                    lobbyName: lobbyName,
-                });
+                if (positionChagned) {
+                    socket.emit("playerMoved", {
+                        id: currentPlayer.userNameClock,
+                        x: currentPlayer.x,
+                        y: currentPlayer.y,
+                        lobbyName: lobbyName,
+                    });
+                    lastPosition = { x: currentPlayer.x, y: currentPlayer.y };
+                }
             }
         }
         redrawCanvas();

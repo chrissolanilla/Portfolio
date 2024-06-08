@@ -1,14 +1,13 @@
-const express = require('express');
-const http = require('http');
-const lobbyManager = require('./lobbyManager');
+import express from 'express'
+import http from 'http'
+import lobbyManager from './lobbyManager.js';
 const app = express();
-
+import { Server as SocketIOServer } from 'socket.io';
 // Apply CORS middleware to all responses
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     next();
 });
-
 // Define routes
 app.get('/api/sayHi', (req, res) => {
     console.log('Received request on /api/sayHi');
@@ -24,25 +23,25 @@ app.get('/', (req, res) => {
 });
 
 const server = http.createServer(app);
-
-const io = require('socket.io')(server, {
+const io = new SocketIOServer(server, {
     cors: {
-        origin: "*", // Allow all origins
-        methods: ["GET", "POST"] // Allow only GET and POST requests
+        origin: "*",
+        methods: ["GET", "POST"]
     }
-});
-
-
+})
+// const io = require('socket.io')(server, {
+//     cors: {
+//         origin: "*", // Allow all origins
+//         methods: ["GET", "POST"] // Allow only GET and POST requests
+//     }
+// });
 // Chat Namespace
 const chat = io.of('/chat');
-
 let userCountChat = 0; //track the number of connected users.
 const activeUsersChat = {};// add an object to keep track of the users.
 
 chat.on('connection', (socket) => {
     //RealTimeChat logic
-    //////////
-    ///////////
     let userNameChat;
     socket.emit('userCountChat', { count: Object.keys(activeUsersChat).length }); //send current user count immiedietly
 
@@ -59,12 +58,7 @@ chat.on('connection', (socket) => {
             chat.emit('userCountChat', { count: userCountChat });
         }
     });
-
-
-    // userCount++; //increment user userCount
-    // io.emit('userCount', { count: userCount }); //emit the count to all
     // console.log('A user connected');
-
     socket.on('sendMessage', (messageObject) => {
         console.log('Message from client:', messageObject);
         // Include the sender's socket ID in the message object
@@ -91,17 +85,8 @@ chat.on('connection', (socket) => {
         // io.emit('userCount', { count: userCount })
     });
 });
-//
-//
-//
 //clock tower logic
-//////////
-///////////
 //have a different activeUsernames for clock tower
-//
-//
-//
-//
 // Clock Namespace
 const clock = io.of('/clock');
 clock.on('connection', (socket) => {
@@ -178,29 +163,6 @@ clock.on('connection', (socket) => {
             socket.emit('lobbyPlayersUpdate', { players, gameStarted });
         }
     })
-
-    // socket.on('playerMoved', ({ id, x, y, lobbyName }) => {
-    //   // const lobbyName = lobbyManager.retrieveLobbyNameFromSocket(socket);
-    //   // console.log(lobbyName, 'is the name of the lobby')
-    //   const lobbies = lobbyManager.getLobbies();
-    //   const lobby = lobbies.find(lobby => lobby.name === lobbyName);
-    //   // console.log('our lobby is ', lobby);
-    //   // console.log('the lobbies are',lobbies)
-    //   if(!lobby){
-    //     console.log('no lobby, returning');
-    //     return;
-    //   }
-    //   const player = lobby.players.find(player => player.userNameClock === id);
-    //   if(!player){
-    //     console.log('no player, returning');
-    //     return;
-    //   }
-    //   //update player positions
-    //   player.x = x;
-    //   player.y = y;
-    //   //boradcast the player postion to all clients in lobby
-    //   clock.to(lobbyName).emit('updatePlayerPosition', {id, x, y });
-    // })
 
     socket.on('startGame', ({ lobbyName }) => {
         lobbyManager.startGame(lobbyName, io, 0);
@@ -287,10 +249,6 @@ clock.on('connection', (socket) => {
         });
     });
 });
-
-
-
-
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
