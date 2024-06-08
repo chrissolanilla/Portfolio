@@ -1,128 +1,155 @@
 <script>
     import { onMount } from "svelte";
-    import { socketStore } from "../stores/socketStore";
+    /** @type {Array<{userNameClock: string, x: number, y: number, avatar: string}>} */
     export let players = [];
+    /** @type {import('socket.io-client').Socket} */
     export let socket;
+    /** @type {string} */
     export let currentUserNameClock;
+    /** @type {string} */
     export let lobbyName;
-
+    /** @type {HTMLCanvasElement} */
     let canvas;
+    /** @type {CanvasRenderingContext2D} */
     let ctx;
     let clientRole = "";
+    const movementSpeed = 5;
+    let backgroundImageLoaded = false;
+    const backgroundImage = new Image();
+    backgroundImage.src = "/background.png";
+
+    const avatars = {}; // Store preloaded avatars
+
+    function gameLoop() {
+        if (window.heldKeys) {
+            const currentPlayer = players.find(
+                (player) => player.userNameClock === currentUserNameClock,
+            );
+            if (currentPlayer) {
+                if (window.heldKeys["w"]) {
+                    currentPlayer.y -= movementSpeed;
+                }
+                if (window.heldKeys["s"]) {
+                    currentPlayer.y += movementSpeed;
+                }
+                if (window.heldKeys["a"]) {
+                    currentPlayer.x -= movementSpeed;
+                }
+                if (window.heldKeys["d"]) {
+                    currentPlayer.x += movementSpeed;
+                }
+                socket.emit("playerMoved", {
+                    id: currentPlayer.userNameClock,
+                    x: currentPlayer.x,
+                    y: currentPlayer.y,
+                    lobbyName: lobbyName,
+                });
+            }
+        }
+        redrawCanvas();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function drawBackground() {
+        console.log("Drawing background");
+        if (backgroundImageLoaded) {
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = "#ADD8E6"; // Light blue background color
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function drawPlayers() {
+        console.log("Drawing players:", players);
+        players.forEach((player) => {
+            const avatar = avatars[player.userNameClock];
+            if (avatar) {
+                ctx.drawImage(avatar, player.x, player.y, 50, 50);
+                console.log(`Drew player at x: ${player.x}, y: ${player.y}`);
+            }
+        });
+    }
+
+    function preloadAvatars() {
+        players.forEach((player) => {
+            const avatar = new Image();
+            avatar.src = player.avatar;
+            avatar.onload = () => {
+                avatars[player.userNameClock] = avatar;
+                console.log(
+                    `Preloaded avatar for player: ${player.userNameClock}`,
+                );
+            };
+        });
+    }
+
+    function redrawCanvas() {
+        console.log("Redrawing canvas");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+        drawPlayers();
+    }
 
     onMount(() => {
         ctx = canvas.getContext("2d");
-        drawBackground();
-        drawPlayers();
+        if (!ctx) {
+            console.error("Failed to get canvas context");
+            return;
+        }
+        console.log("Canvas context initialized");
+
+        window.heldKeys = {}; // Track the held keys
+
+        backgroundImage.onload = () => {
+            backgroundImageLoaded = true;
+            console.log("Background image loaded");
+            redrawCanvas(); // Ensure the background is drawn once it is loaded
+        };
+
         socket.on("updatePlayerPosition", ({ id, x, y }) => {
             const playerIndex = players.findIndex(
                 (player) => player.userNameClock === id,
             );
             if (playerIndex === -1) return;
-            console.log(`Updating position for ${id}: x=${x}, y=${y}`);
             players[playerIndex].x = x;
             players[playerIndex].y = y;
+            redrawCanvas();
+        });
 
-            redrawCanvas();
-        });
-        //get starting possitons
         socket.on("initializePlayers", (playersData) => {
-            console.log("Received initializePlayers:", playersData); //this does not run
-            players = playersData; //update the local player array with the positions
+            console.log("Initializing players:", playersData);
+            players = playersData;
+            preloadAvatars(); // Preload avatars when players are initialized
             redrawCanvas();
         });
-        console.log("Client ready and listeninig for initializePlayers event"); //this runs
-        // Listen for keyboard events to move the player
-        window.addEventListener("keydown", handleKeyDown);
+
+        window.addEventListener("keydown", (event) => {
+            window.heldKeys[event.key] = true;
+        });
+
+        window.addEventListener("keyup", (event) => {
+            delete window.heldKeys[event.key];
+        });
+
+        gameLoop();
 
         socket.on("roleAssigned", ({ role, team }) => {
-            console.log("Role:", role, "Team: ", team);
             clientRole = role;
         });
+
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
         };
     });
-
-    function drawBackground() {
-        const background = new Image();
-        background.src = "/background.png";
-        background.onload = () => {
-            ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-        };
-    }
-
-    function spawnPlayers(players, canvasWidth, canvasHeight) {
-        const centerX = canvasWidth / 2;
-        const centerY = canvasHeight / 2;
-        const radius = 100; // adjust this if needed
-        players.forEach((player, index) => {
-            const totalPlayers = player.length;
-            const angle = (index / totalPlayers) * 2 * Math.PI;
-
-            player.x = centerX + radius * Math.cos(angle);
-            player.y = centerY + radius * Math.sin(angle);
-        });
-    }
-
-    function drawPlayers() {
-        players.forEach((player) => {
-            const avatar = new Image();
-            avatar.src = player.avatar;
-            avatar.onload = () => {
-                ctx.drawImage(avatar, player.x, player.y, 50, 50);
-            };
-        });
-    }
-
-    function handleKeyDown(event) {
-        //somehow get the currentPlayerId
-        const currentPlayer = players.find(
-            (player) => player.userNameClock === currentUserNameClock,
-        );
-        if (!currentPlayer) return; // make sure the current player is found? do nothing when spectating the game i guess.
-        const movementSpeed = 5;
-        console.log(movementSpeed);
-
-        switch (event.key) {
-            case "ArrowUp":
-            case "w":
-                currentPlayer.y -= movementSpeed;
-                break;
-            case "ArrowDown":
-            case "s":
-                currentPlayer.y += movementSpeed;
-                break;
-            case "ArrowLeft":
-            case "a":
-                currentPlayer.x -= movementSpeed;
-                break;
-            case "ArrowRight":
-            case "d":
-                currentPlayer.x += movementSpeed;
-                break;
-        }
-
-        socket.emit("playerMoved", {
-            id: currentPlayer.userNameClock,
-            x: currentPlayer.x,
-            y: currentPlayer.y,
-            lobbyName: lobbyName,
-        });
-        console.log("player x is ", currentPlayer.x);
-        console.log("player y is ", currentPlayer.y);
-        redrawCanvas();
-    }
-
-    function redrawCanvas() {
-        console.log("Redrawing canvas with players:", players);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBackground();
-        drawPlayers();
-    }
 </script>
 
-<canvas bind:this={canvas} width="1700 " height="1080"></canvas>
-<!-- Adjust size as needed -->
+<canvas
+    bind:this={canvas}
+    width="1700"
+    height="1080"
+    style="border: 1px solid black;"
+></canvas>
 <h1>your role is {clientRole}.</h1>
 
