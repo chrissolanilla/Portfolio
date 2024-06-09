@@ -253,15 +253,4 @@ export default {
     getGameStarted,
     startGame,
 }
-// module.exports = {
-//     createLobby,
-//     joinLobby,
-//     leaveLobby,
-//     getLobbies,
-//     deleteLobby,
-//     getLobbyPlayers,
-//     retrieveLobbyNameFromSocket,
-//     getGameStarted,
-//     startGame,
-// };
 
