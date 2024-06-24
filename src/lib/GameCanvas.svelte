@@ -15,7 +15,7 @@
     let backgroundImageLoaded = false;
     const backgroundImage = new Image();
     backgroundImage.src = "/background.png";
-
+    let currentDay = 0;
     const avatars = {}; // Store preloaded avatars
     /** @type {null | {x: number, y: number}} */
     let lastPosition = { x: null, y: null };
@@ -137,6 +137,11 @@
             redrawCanvas();
         });
 
+        socket.on("firstDay", (dayNumber) => {
+                console.log("current day is: " , dayNumber)
+                currentDay = dayNumber;
+            });
+
         window.addEventListener("keydown", (event) => {
             window.heldKeys[event.key] = true;
         });
@@ -157,7 +162,7 @@
         };
     });
 </script>
-
+<h1>The current day is {currentDay}</h1>
 <canvas id="canvas"></canvas>
 <h1>your role is {clientRole}.</h1>
 

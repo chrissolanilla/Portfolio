@@ -103,6 +103,8 @@ export function handleClockNamespace(io, lobbyManager) {
             clock.to(lobbyName).emit('updatePlayerPosition', { id, x, y });
         });
 
+        //get what day it is, probalby some socket.on next day or next night
+
         socket.on('disconnect', () => {
             const disconnectTimeout = setTimeout(() => {
                 const updatedLobbies = lobbyManager.deleteLobby(socket.id);
