@@ -122,8 +122,9 @@ function startGame(lobbyName, io, flag) {
     if (flag === 0) {
         setTimeout(() => {
             startGame(lobbyName, io, 1);
-        }, 10000);
+        }, 3000);
     }
+    io.of('/clock').to(lobbyName).emit('firstDay', 1);
 }
 
 /**
