@@ -16,6 +16,9 @@
     const backgroundImage = new Image();
     backgroundImage.src = "/background.png";
     let currentDay = 0;
+    let isNight = false;
+    let timeLeft = 0;
+    let timerRunning = false;
     const avatars = {}; // Store preloaded avatars
     /** @type {null | {x: number, y: number}} */
     let lastPosition = { x: null, y: null };
@@ -140,7 +143,20 @@
         socket.on("firstDay", (dayNumber) => {
                 console.log("current day is: " , dayNumber)
                 currentDay = dayNumber;
-            });
+        });
+        socket.on("getDayNightStatus", (nightBoolean) => {
+            console.log("it is currently", nightBoolean)
+                isNight = nightBoolean;
+        });
+
+        socket.on("timerUpdate", ({ timeLeft: updatedTimeLeft }) => {
+            timeLeft = updatedTimeLeft;
+            timerRunning = true;
+        });
+
+        socket.on("timerFinished", () => {
+            timerRunning = false;
+        });
 
         window.addEventListener("keydown", (event) => {
             window.heldKeys[event.key] = true;
@@ -163,6 +179,9 @@
     });
 </script>
 <h1>The current day is {currentDay}</h1>
+{#if timerRunning}
+    <h1> Time left: {timeLeft}</h1>
+{/if}
 <canvas id="canvas"></canvas>
 <h1>your role is {clientRole}.</h1>
 

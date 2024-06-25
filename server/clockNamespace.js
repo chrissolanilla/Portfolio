@@ -1,6 +1,5 @@
 export function handleClockNamespace(io, lobbyManager) {
     const clock = io.of('/clock');
-
     clock.on('connection', (socket) => {
         console.log("User Connected to Clock");
 
@@ -63,8 +62,22 @@ export function handleClockNamespace(io, lobbyManager) {
 
         socket.on('startGame', ({ lobbyName }) => {
             lobbyManager.startGame(lobbyName, io, 0);
+            startCountdown(lobbyName, 20);
             clock.to(lobbyName).emit('gameStarted', { gameStarted: true });
         });
+        function startCountdown(lobbyName, duration) {
+            let timeLeft = duration;
+            const interval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    clock.to(lobbyName).emit('timerFinished');
+                } else {
+                    clock.to(lobbyName).emit('timerUpdate', { timeLeft });
+                    timeLeft -= 1;
+                }
+            }, 1000)
+        }
+
 
         socket.on('getLobbies', () => {
             const currentLobbies = lobbyManager.getLobbies();
@@ -102,6 +115,7 @@ export function handleClockNamespace(io, lobbyManager) {
             player.y = y;
             clock.to(lobbyName).emit('updatePlayerPosition', { id, x, y });
         });
+
 
         //get what day it is, probalby some socket.on next day or next night
 

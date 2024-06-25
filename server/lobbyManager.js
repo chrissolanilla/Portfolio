@@ -17,6 +17,7 @@
  * @property {Player[]} players
  * @property {boolean} gameStarted
  * @property {number} day
+ * @property {boolean} isNight
  */
 
 const lobbies = {};
@@ -38,6 +39,7 @@ function createLobby(socket, lobbyName, io) {
         players: [],
         gameStarted: false,
         day: 0,
+        isNight: false,
     };
     lobbies[lobbyName] = newLobby;
     io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
