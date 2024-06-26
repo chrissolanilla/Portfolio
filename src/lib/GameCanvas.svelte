@@ -61,7 +61,7 @@
     }
 
     function drawBackground() {
-        console.log("Drawing background");
+        // console.log("Drawing background");
         if (backgroundImageLoaded) {
             ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
         } else {
@@ -71,12 +71,12 @@
     }
 
     function drawPlayers() {
-        console.log("Drawing players:", players);
+        // console.log("Drawing players:", players);
         players.forEach((player) => {
             const avatar = avatars[player.userNameClock];
             if (avatar) {
                 ctx.drawImage(avatar, player.x, player.y, 50, 50);
-                console.log(`Drew player at x: ${player.x}, y: ${player.y}`);
+                // console.log(`Drew player at x: ${player.x}, y: ${player.y}`);
             }
         });
     }
@@ -95,7 +95,7 @@
     }
 
     function redrawCanvas() {
-        console.log("Redrawing canvas");
+        // console.log("Redrawing canvas");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
         drawPlayers();
@@ -113,13 +113,13 @@
             console.error("Failed to get canvas context");
             return;
         }
-        console.log("Canvas context initialized");
+        // console.log("Canvas context initialized");
 
         window.heldKeys = {}; // Track the held keys
 
         backgroundImage.onload = () => {
             backgroundImageLoaded = true;
-            console.log("Background image loaded");
+            // console.log("Background image loaded");
             redrawCanvas(); // Ensure the background is drawn once it is loaded
         };
 
@@ -134,7 +134,7 @@
         });
 
         socket.on("initializePlayers", (playersData) => {
-            console.log("Initializing players:", playersData);
+            // console.log("Initializing players:", playersData);
             players = playersData;
             preloadAvatars(); // Preload avatars when players are initialized
             redrawCanvas();
@@ -182,6 +182,7 @@
 {#if timerRunning}
     <h1> Time left: {timeLeft}</h1>
 {/if}
+<h1> Night status {isNight}</h1>
 <canvas id="canvas"></canvas>
 <h1>your role is {clientRole}.</h1>
 

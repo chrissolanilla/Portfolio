@@ -71,6 +71,8 @@ export function handleClockNamespace(io, lobbyManager) {
                 if (timeLeft <= 0) {
                     clearInterval(interval);
                     clock.to(lobbyName).emit('timerFinished');
+                    //go to night time and then start the next day.
+                    clock.to(lobbyName).emit('getDayNightStatus', true)
                 } else {
                     clock.to(lobbyName).emit('timerUpdate', { timeLeft });
                     timeLeft -= 1;
