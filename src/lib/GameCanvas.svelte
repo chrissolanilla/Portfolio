@@ -147,6 +147,13 @@
         socket.on("getDayNightStatus", (nightBoolean) => {
             console.log("it is currently", nightBoolean)
                 isNight = nightBoolean;
+                if(isNight ===true){
+                    //initiate the timer for night time
+                    socket.emit("startNightTimer", {
+                        nightStarted: true,
+                        lobbyName: lobbyName,
+                    });
+                }
         });
 
         socket.on("timerUpdate", ({ timeLeft: updatedTimeLeft }) => {

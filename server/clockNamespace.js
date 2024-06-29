@@ -65,6 +65,15 @@ export function handleClockNamespace(io, lobbyManager) {
             startCountdown(lobbyName, 20);
             clock.to(lobbyName).emit('gameStarted', { gameStarted: true });
         });
+
+        socket.on("startNightTimer", ({ nightStarted, lobbyName }) => {
+            const lobbies = lobbyManager.getLobbies();
+            const lobby = lobbies.find(lobby => lobby.name === lobbyName);
+            if (!lobby) return;
+            //set the lobby night time attribute boolean to true
+            lobby.isNight = nightStarted;
+            console.log(lobby.isNight);
+        })
         function startCountdown(lobbyName, duration) {
             let timeLeft = duration;
             const interval = setInterval(() => {
