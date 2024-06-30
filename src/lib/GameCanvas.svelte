@@ -19,6 +19,7 @@
     let isNight = false;
     let timeLeft = 0;
     let timerRunning = false;
+    let gameOver = false;
     const avatars = {}; // Store preloaded avatars
     /** @type {null | {x: number, y: number}} */
     let lastPosition = { x: null, y: null };
@@ -144,11 +145,15 @@
                 console.log("current day is: " , dayNumber)
                 currentDay = dayNumber;
         });
+        socket.on("nextDay", (dayNumber) => {
+            console.log("going to the next day");
+            currentDay = dayNumber;
+        })
         socket.on("getDayNightStatus", (nightBoolean) => {
             console.log("it is currently", nightBoolean)
                 isNight = nightBoolean;
                 if(isNight ===true){
-                    //initiate the timer for night time
+                    //initiate the timer that is the same for day time
                     socket.emit("startNightTimer", {
                         nightStarted: true,
                         lobbyName: lobbyName,
@@ -163,6 +168,18 @@
 
         socket.on("timerFinished", () => {
             timerRunning = false;
+            if(isNight) {
+                //send the event to change it to next day
+                socket.emit("goToNextDay", {lobbyName: lobbyName, nextDay: currentDay+1});
+            }
+            else {
+                //that means its day time so we go to night time
+                socket.emit("goToNightTime", {lobbyName: lobbyName});
+            }
+        });
+
+        socket.on("gameOver", () => {
+           gameOver = true;
         });
 
         window.addEventListener("keydown", (event) => {
@@ -190,7 +207,11 @@
     <h1> Time left: {timeLeft}</h1>
 {/if}
 <h1> Night status {isNight}</h1>
-<canvas id="canvas"></canvas>
+{#if !gameOver}
+    <canvas id="canvas"></canvas>
+{:else}
+    <h1> The game is over... {gameOver}</h1>
+{/if}
 <h1>your role is {clientRole}.</h1>
 
 <footer>

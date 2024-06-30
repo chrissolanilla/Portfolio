@@ -62,26 +62,62 @@ export function handleClockNamespace(io, lobbyManager) {
 
         socket.on('startGame', ({ lobbyName }) => {
             lobbyManager.startGame(lobbyName, io, 0);
-            startCountdown(lobbyName, 20);
+            startCountdown(lobbyName, 20, 'day');
             clock.to(lobbyName).emit('gameStarted', { gameStarted: true });
+        });
+
+        socket.on('goToNextDay', ({ lobbyName, nextDay }) => {
+            const lobbies = lobbyManager.getLobbies();
+            const lobby = lobbies.find(lobby => lobby.name === lobbyName);
+            if (!lobby) return;
+            //validate first if we already recieved this call
+            console.log("our current day before if statement is ", lobby.day);
+            if (!lobby.isDayTransitionInProgress) {
+                lobby.isDayTransitionInProgress = true;
+                if (nextDay === lobby.day + 1) {
+                    lobby.day += 1;
+                    clock.to(lobbyName).emit('nextDay', lobby.day);
+                    console.log("AFter next day our lobby.day is ", lobby.day);
+                    lobby.isNight = false;
+                    startCountdown(lobbyName, 20, 'day');
+                }
+                setTimeout(() => {
+                    lobby.isDayTransitionInProgress = false;
+                }, 1000);
+            }
         });
 
         socket.on("startNightTimer", ({ nightStarted, lobbyName }) => {
             const lobbies = lobbyManager.getLobbies();
             const lobby = lobbies.find(lobby => lobby.name === lobbyName);
             if (!lobby) return;
+            if (lobby.isDayTransitionInProgress) return;
+            lobby.isDayTransitionInProgress = true;
             //set the lobby night time attribute boolean to true
             lobby.isNight = nightStarted;
-            console.log(lobby.isNight);
-        })
-        function startCountdown(lobbyName, duration) {
+            console.log("the current lobby is night", lobby.isNight);
+            startCountdown(lobbyName, 10, 'night');
+            setTimeout(() => {
+                lobby.isDayTransitionInProgress = false;
+            }, 1000);
+        });
+        function startCountdown(lobbyName, duration, dayStatus) {
             let timeLeft = duration;
             const interval = setInterval(() => {
+                console.log(timeLeft, " seconds left");
                 if (timeLeft <= 0) {
+                    console.log("day parameter is ", dayStatus)
                     clearInterval(interval);
                     clock.to(lobbyName).emit('timerFinished');
-                    //go to night time and then start the next day.
-                    clock.to(lobbyName).emit('getDayNightStatus', true)
+                    if (dayStatus === 'day') {
+                        //go to night time and then start the next day.
+                        console.log("going to night time...");
+                        clock.to(lobbyName).emit('getDayNightStatus', true);
+                    }
+                    else if (dayStatus === 'night') {
+                        clock.to(lobbyName).emit('getDayNightStatus', false);
+                        console.log("going to day(next day) time...");
+                    }
                 } else {
                     clock.to(lobbyName).emit('timerUpdate', { timeLeft });
                     timeLeft -= 1;
