@@ -40,6 +40,7 @@ function createLobby(socket, lobbyName, io) {
         gameStarted: false,
         day: 0,
         isNight: false,
+        isDayTransitionInProgress: false,
     };
     lobbies[lobbyName] = newLobby;
     io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
@@ -124,31 +125,66 @@ function startGame(lobbyName, io, flag) {
     if (flag === 0) {
         setTimeout(() => {
             startGame(lobbyName, io, 1);
+            console.log("starting the game loop");
         }, 3000);
     }
     io.of('/clock').to(lobbyName).emit('firstDay', 1);
+    lobby.day = 1;
+    // if (flag === 1) {
+    //     manageGamePhases(lobby, io);//start the game loop
+    // }
 }
 
-/**
- * @param {object} socket
- * @param {object} io
- * @param {object} position
- * @param {string} position.id
- * @param {number} position.x
- * @param {number} position.y
- * @param {string} position.lobbyName
- */
-// function updatePlayerPosition(socket, io, { id, x, y, lobbyName }) {
-//     const lobby = lobbies[lobbyName];
-//     if (!lobby) return;
+// function manageGamePhases(lobby, io) {
+//     const phaseTimer = setInterval(() => {
+//         if (lobby.isNight) {
+//             // startNightTimer(lobby, io);
+//             console.log("its night time");
+//             let timeLeft = 20;
+//             const nightTimer = setInterval(() => {
+//                 if (timeLeft <= 0) {
+//                     //no time left so we go on to next day
+//                     clearInterval(nightTimer);
+//                     lobby.isNight = false;
+//                     lobby.day++;
+//                     io.of('/clock').to(lobby.name).emit('dayNightUpdate', { isNightBoolean: false, day: lobby.day });
+//                 } else {
+//                     console.log("the time is ", timeLeft);
+//                     io.of('/clock').to(lobby.name).emit('nightTimerUpdate', { timeLeft });
+//                     timeLeft--;
+//                 }
+//             }, 1000);
 //
-//     const player = lobby.players.find(player => player.userNameClock === id);
-//     if (!player) return;
+//         } else {
+//             //some day logic
+//             console.log("the lobby is ", lobby);
+//             console.log("its day time");
+//             console.log("it is day ", lobby.day);
+//         }
 //
-//     player.x = x;
-//     player.y = y;
-//     console.log("Sending player position to lobby: ", lobbyName, "player: ", id, "x: ", x, "y: ", y);
-//     io.of('/clock').to(lobbyName).emit('updatePlayerPosition', { id, x, y });
+//         if (lobby.day >= 6) {
+//             clearInterval(phaseTimer);
+//             //end game logic
+//             console.log('gameover...');
+//             io.of('/clock').to(lobby.name).emit('gameOver');
+//             delete lobbies[lobby.name];
+//         }
+//     }, 1000)
+// }
+// function startNightTimer(lobby, io) {
+//     let timeLeft = 20;
+//     const nightTimer = setInterval(() => {
+//         if (timeLeft <= 0) {
+//             //no time left so we go on to next day
+//             clearInterval(nightTimer);
+//             lobby.isNight = false;
+//             lobby.day++;
+//             io.of('/clock').to(lobby.name).emit('dayNightUpdate', { isNightBoolean: false, day: lobby.day });
+//         } else {
+//             io.of('/clock').to(lobby.name).emit('nightTimerUpdate', { timeLeft });
+//             timeLeft--;
+//         }
+//     }, 1000);
 // }
 
 /**
