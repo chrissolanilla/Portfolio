@@ -29,22 +29,22 @@ const lobbies = {};
  * @returns {string|null}
  */
 function createLobby(socket, lobbyName, io) {
-    if (lobbies[lobbyName]) {
-        return null;
-    }
-    /** @type {Lobby} */
-    const newLobby = {
-        name: lobbyName,
-        owner: socket.id,
-        players: [],
-        gameStarted: false,
-        day: 0,
-        isNight: false,
-        isDayTransitionInProgress: false,
-    };
-    lobbies[lobbyName] = newLobby;
-    io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
-    return lobbyName;
+  if (lobbies[lobbyName]) {
+    return null;
+  }
+  /** @type {Lobby} */
+  const newLobby = {
+    name: lobbyName,
+    owner: socket.id,
+    players: [],
+    gameStarted: false,
+    day: 0,
+    isNight: false,
+    isDayTransitionInProgress: false,
+  };
+  lobbies[lobbyName] = newLobby;
+  io.to(socket.id).emit("lobbyWelcome", { gameName: lobbyName });
+  return lobbyName;
 }
 
 /**
@@ -55,41 +55,47 @@ function createLobby(socket, lobbyName, io) {
  * @returns {boolean}
  */
 function joinLobby(socket, lobbyName, io, userNameClock) {
-    console.log(`Attempting to join lobby: ${lobbyName} with userName: ${userNameClock}`);
-    const lobby = lobbies[lobbyName];
+  console.log(
+    `Attempting to join lobby: ${lobbyName} with userName: ${userNameClock}`,
+  );
+  const lobby = lobbies[lobbyName];
 
-    if (!lobby || lobby.gameStarted || lobby.players.some(player => player.userNameClock === userNameClock)) {
-        return false;
-    }
+  if (
+    !lobby ||
+    lobby.gameStarted ||
+    lobby.players.some((player) => player.userNameClock === userNameClock)
+  ) {
+    return false;
+  }
 
-    /** @type {Player} */
-    const newPlayer = {
-        userNameClock,
-        team: "",
-        alive: true,
-        role: "",
-        x: 100,
-        y: 100,
-        avatar: '/default.svg',
-        socketID: socket.id,
-    };
-    lobby.players.push(newPlayer);
+  /** @type {Player} */
+  const newPlayer = {
+    userNameClock,
+    team: "",
+    alive: true,
+    role: "",
+    x: 100,
+    y: 100,
+    avatar: "/default.svg",
+    socketID: socket.id,
+  };
+  lobby.players.push(newPlayer);
 
-    socket.join(lobbyName, () => {
-        io.to(lobbyName).emit('lobbyPlayersUpdate', {
-            players: lobby.players.map(player => ({
-                userNameClock: player.userNameClock,
-                team: player.team,
-                alive: player.alive,
-                role: player.role,
-                x: player.x,
-                y: player.y,
-                avatar: player.avatar
-            }))
-        });
+  socket.join(lobbyName, () => {
+    io.to(lobbyName).emit("lobbyPlayersUpdate", {
+      players: lobby.players.map((player) => ({
+        userNameClock: player.userNameClock,
+        team: player.team,
+        alive: player.alive,
+        role: player.role,
+        x: player.x,
+        y: player.y,
+        avatar: player.avatar,
+      })),
     });
+  });
 
-    return true;
+  return true;
 }
 
 /**
@@ -98,118 +104,70 @@ function joinLobby(socket, lobbyName, io, userNameClock) {
  * @param {number} flag
  */
 function startGame(lobbyName, io, flag) {
-    const lobby = lobbies[lobbyName];
-    if (!lobby) return;
+  const lobby = lobbies[lobbyName];
+  if (!lobby) return;
 
-    lobby.players = assignRoles(lobby.players);
-    lobby.players.forEach(player => {
-        const playerSocket = io.of('/clock').sockets.get(player.socketID);
-        if (playerSocket) {
-            playerSocket.emit('roleAssigned', {
-                role: player.role,
-                team: player.team
-            });
-        }
-    });
-    const centerX = 850;
-    const centerY = 540;
-    const radius = 100;
-    lobby.players.forEach((player, index, playersArray) => {
-        const angle = (index / playersArray.length) * 2 * Math.PI;
-        player.x = centerX + radius * Math.cos(angle);
-        player.y = centerY + radius * Math.sin(angle);
-        console.log(`Initial position for ${player.userNameClock}: x=${player.x}, y=${player.y}`);
-    });
-    lobby.gameStarted = true;
-    io.of('/clock').to(lobbyName).emit('initializePlayers', lobby.players);
-    if (flag === 0) {
-        setTimeout(() => {
-            startGame(lobbyName, io, 1);
-            console.log("starting the game loop");
-        }, 3000);
+  lobby.players = assignRoles(lobby.players);
+  lobby.players.forEach((player) => {
+    const playerSocket = io.of("/clock").sockets.get(player.socketID);
+    if (playerSocket) {
+      playerSocket.emit("roleAssigned", {
+        role: player.role,
+        team: player.team,
+      });
     }
-    io.of('/clock').to(lobbyName).emit('firstDay', 1);
-    lobby.day = 1;
-    // if (flag === 1) {
-    //     manageGamePhases(lobby, io);//start the game loop
-    // }
+  });
+  const centerX = 850;
+  const centerY = 540;
+  const radius = 100;
+  lobby.players.forEach((player, index, playersArray) => {
+    const angle = (index / playersArray.length) * 2 * Math.PI;
+    player.x = centerX + radius * Math.cos(angle);
+    player.y = centerY + radius * Math.sin(angle);
+    console.log(
+      `Initial position for ${player.userNameClock}: x=${player.x}, y=${player.y}`,
+    );
+  });
+  lobby.gameStarted = true;
+  io.of("/clock").to(lobbyName).emit("initializePlayers", lobby.players);
+  if (flag === 0) {
+    setTimeout(() => {
+      startGame(lobbyName, io, 1);
+      console.log("starting the game loop");
+    }, 3000);
+  }
+  io.of("/clock").to(lobbyName).emit("firstDay", 1);
+  lobby.day = 1;
+  // if (flag === 1) {
+  //     manageGamePhases(lobby, io);//start the game loop
+  // }
 }
-
-// function manageGamePhases(lobby, io) {
-//     const phaseTimer = setInterval(() => {
-//         if (lobby.isNight) {
-//             // startNightTimer(lobby, io);
-//             console.log("its night time");
-//             let timeLeft = 20;
-//             const nightTimer = setInterval(() => {
-//                 if (timeLeft <= 0) {
-//                     //no time left so we go on to next day
-//                     clearInterval(nightTimer);
-//                     lobby.isNight = false;
-//                     lobby.day++;
-//                     io.of('/clock').to(lobby.name).emit('dayNightUpdate', { isNightBoolean: false, day: lobby.day });
-//                 } else {
-//                     console.log("the time is ", timeLeft);
-//                     io.of('/clock').to(lobby.name).emit('nightTimerUpdate', { timeLeft });
-//                     timeLeft--;
-//                 }
-//             }, 1000);
-//
-//         } else {
-//             //some day logic
-//             console.log("the lobby is ", lobby);
-//             console.log("its day time");
-//             console.log("it is day ", lobby.day);
-//         }
-//
-//         if (lobby.day >= 6) {
-//             clearInterval(phaseTimer);
-//             //end game logic
-//             console.log('gameover...');
-//             io.of('/clock').to(lobby.name).emit('gameOver');
-//             delete lobbies[lobby.name];
-//         }
-//     }, 1000)
-// }
-// function startNightTimer(lobby, io) {
-//     let timeLeft = 20;
-//     const nightTimer = setInterval(() => {
-//         if (timeLeft <= 0) {
-//             //no time left so we go on to next day
-//             clearInterval(nightTimer);
-//             lobby.isNight = false;
-//             lobby.day++;
-//             io.of('/clock').to(lobby.name).emit('dayNightUpdate', { isNightBoolean: false, day: lobby.day });
-//         } else {
-//             io.of('/clock').to(lobby.name).emit('nightTimerUpdate', { timeLeft });
-//             timeLeft--;
-//         }
-//     }, 1000);
-// }
 
 /**
  * @param {object} socket
  * @param {string} lobbyName
  */
 function leaveLobby(socket, lobbyName) {
-    const lobby = lobbies[lobbyName];
-    if (lobby) {
-        lobby.players = lobby.players.filter(player => player.socketID !== socket.id);
+  const lobby = lobbies[lobbyName];
+  if (lobby) {
+    lobby.players = lobby.players.filter(
+      (player) => player.socketID !== socket.id,
+    );
 
-        const updatedPlayers = lobby.players.map(player => player.userNameClock);
-        io.to(lobbyName).emit('lobbyPlayersUpdate', { players: updatedPlayers });
+    const updatedPlayers = lobby.players.map((player) => player.userNameClock);
+    io.to(lobbyName).emit("lobbyPlayersUpdate", { players: updatedPlayers });
 
-        if (lobby.players.length === 0) {
-            delete lobbies[lobbyName];
-        }
+    if (lobby.players.length === 0) {
+      delete lobbies[lobbyName];
     }
+  }
 }
 
 /**
  * @returns {Lobby[]}
  */
 function getLobbies() {
-    return Object.values(lobbies); // Convert the lobbies object to an array
+  return Object.values(lobbies); // Convert the lobbies object to an array
 }
 
 /**
@@ -217,13 +175,13 @@ function getLobbies() {
  * @returns {Player[]}
  */
 function getLobbyPlayers(lobbyName) {
-    const lobby = lobbies[lobbyName];
-    if (lobby && lobby.players) {
-        console.log('the value of players array is ', lobby.players);
-        return lobby.players;
-    } else {
-        return [];
-    }
+  const lobby = lobbies[lobbyName];
+  if (lobby && lobby.players) {
+    console.log("the value of players array is ", lobby.players);
+    return lobby.players;
+  } else {
+    return [];
+  }
 }
 
 /**
@@ -231,14 +189,14 @@ function getLobbyPlayers(lobbyName) {
  * @returns {Lobby[]}
  */
 function deleteLobby(socketId) {
-    Object.keys(lobbies).forEach(lobbyName => {
-        const lobby = lobbies[lobbyName];
-        if (lobby.owner === socketId) {
-            delete lobbies[lobbyName];
-        }
-    });
+  Object.keys(lobbies).forEach((lobbyName) => {
+    const lobby = lobbies[lobbyName];
+    if (lobby.owner === socketId) {
+      delete lobbies[lobbyName];
+    }
+  });
 
-    return Object.values(lobbies);
+  return Object.values(lobbies);
 }
 
 /**
@@ -246,7 +204,7 @@ function deleteLobby(socketId) {
  * @returns {string}
  */
 function retrieveLobbyNameFromSocket(socket) {
-    return socket.handshake.query.lobbyName;
+  return socket.handshake.query.lobbyName;
 }
 
 /**
@@ -254,12 +212,12 @@ function retrieveLobbyNameFromSocket(socket) {
  * @returns {boolean}
  */
 function getGameStarted(lobbyName) {
-    const lobby = lobbies[lobbyName];
-    if (lobby) {
-        return lobby.gameStarted;
-    } else {
-        return false; // Default to false if the lobby doesn't exist
-    }
+  const lobby = lobbies[lobbyName];
+  if (lobby) {
+    return lobby.gameStarted;
+  } else {
+    return false; // Default to false if the lobby doesn't exist
+  }
 }
 
 /**
@@ -267,29 +225,27 @@ function getGameStarted(lobbyName) {
  * @returns {Player[]}
  */
 function assignRoles(players) {
-    const shuffledPlayers = players.sort(() => 0.5 - Math.random());
-    shuffledPlayers[0].role = 'Leviathan';
-    shuffledPlayers[0].team = 'EvilTeam';
-    shuffledPlayers[1].role = 'Goblin';
-    shuffledPlayers[1].team = 'EvilTeam';
+  const shuffledPlayers = players.sort(() => 0.5 - Math.random());
+  shuffledPlayers[0].role = "Leviathan";
+  shuffledPlayers[0].team = "EvilTeam";
+  shuffledPlayers[1].role = "Goblin";
+  shuffledPlayers[1].team = "EvilTeam";
 
-    for (let i = 2; i < shuffledPlayers.length; i++) {
-        shuffledPlayers[i].role = 'Good';
-        shuffledPlayers[i].team = 'GoodTeam';
-    }
+  for (let i = 2; i < shuffledPlayers.length; i++) {
+    shuffledPlayers[i].role = "Good";
+    shuffledPlayers[i].team = "GoodTeam";
+  }
 
-    return shuffledPlayers;
+  return shuffledPlayers;
 }
 export default {
-
-    createLobby,
-    joinLobby,
-    leaveLobby,
-    getLobbies,
-    deleteLobby,
-    getLobbyPlayers,
-    retrieveLobbyNameFromSocket,
-    getGameStarted,
-    startGame,
-}
-
+  createLobby,
+  joinLobby,
+  leaveLobby,
+  getLobbies,
+  deleteLobby,
+  getLobbyPlayers,
+  retrieveLobbyNameFromSocket,
+  getGameStarted,
+  startGame,
+};
