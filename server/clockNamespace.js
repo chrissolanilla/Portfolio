@@ -59,6 +59,14 @@ export function handleClockNamespace(io, lobbyManager) {
                 socket.emit('lobbyPlayersUpdate', { players, gameStarted });
             }
         });
+        //messaging in the game hopefully stays for individual lobbies
+        socket.on('sendMessageClock', (messageObject, lobbyName) => {
+            const lobbies = lobbyManager.getLobbies();
+            const lobby = lobbies.find(lobby => lobby.name === lobbyName);
+            if (!lobby) return;
+            const message = messageObject;
+            clock.to(lobbyName).emit('showMessage', message);
+        });
 
         socket.on('startGame', ({ lobbyName }) => {
             lobbyManager.startGame(lobbyName, io, 0);
