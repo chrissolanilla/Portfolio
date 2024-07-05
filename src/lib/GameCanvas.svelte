@@ -201,6 +201,29 @@
             window.removeEventListener("keyup", handleKeyUp);
         };
     });
+    let message = 'No initial message';
+    let inputMessage = '';
+    let messages = [];
+
+    function sendMessage() {
+    if (inputMessage.trim() !== '') {
+          const messageObject = {
+            name: currentUserNameClock,
+            text: inputMessage,
+            timestamp: new Date().toISOString()
+          };
+          // socket.emit('sendMessage', messageObject);
+          console.log(messageObject);
+          inputMessage = '';
+        }
+    }
+
+  function handleEnterPress(event) {
+    if (event.key === 'Enter') {
+      sendMessage();
+    }
+  }
+
 </script>
 <h1>The current day is {currentDay}</h1>
 {#if timerRunning}
@@ -208,7 +231,30 @@
 {/if}
 <h1> Night status {isNight}</h1>
 {#if !gameOver}
-    <canvas id="canvas"></canvas>
+    <div class="flex ">
+        <canvas id="canvas"></canvas>
+        <!-- some simple chat box for players to talk -->
+        <!-- Chat interface -->
+        <div class="chat-containerChris"  >
+          {#each messages as message}
+          <div class={message.type === 'sent' ? 'chatChris chat-endChris' : 'chatChris chat-startChris'}>
+            <div class="chat-headerChris">
+              {message.type === 'sent' ? 'You' : message.name}
+              <time class="text-xs opacity-50">{message.time || 'Just now'}</time>
+            </div>
+            <div class="chat-bubbleChris">{message.text}</div>
+            <div class="chat-footerChris opacity-50">
+              {message.type === 'sent' ? 'Delivered' : 'Seen'}
+            </div>
+          </div>
+          {/each}
+        </div>
+        <div class="centerChris">
+          <input type="text" bind:value={inputMessage}  class="input input-bordered input-secondary w-full max-w-xs" on:keydown={handleEnterPress}  />
+          <button on:click={sendMessage} class="btn btn-secondary">Send Message</button>
+        </div>
+
+    </div>
 {:else}
     <h1> The game is over... {gameOver}</h1>
 {/if}
