@@ -248,6 +248,13 @@
     justify-content: center;
     gap: 10px;
   }
+  .chat-containerChris {
+    display: flex;
+    flex-direction: column-reverse;
+    max-width: 400px;
+    max-height: 700px;
+    overflow-y: auto;
+  }
 </style>
 
 <h1>The current day is {currentDay}</h1>
@@ -256,21 +263,25 @@
 {/if}
 <h1>Night status {isNight}</h1>
 {#if !gameOver}
-  <div class="flex">
+  <div class="flex align-center">
     <canvas id="canvas"></canvas>
     <!-- some simple chat box for players to talk -->
     <!-- Chat interface -->
-    <div class="flex flex-col">
+    <div class="BeforeRowREverse">
       <div class="chat-containerChris">
-        {#each messages as message}
-          <div class="flex gap-2">
-            <div class="">
-              {message.type === 'sent' ? 'You' : message.name + ': '}
+        <div class="flex flex-col">
+          {#each messages as message}
+            <div class="flex gap-2">
+              <div class="">
+                {message.type === 'sent' ? 'You' : message.name + ': '}
+              </div>
+              <div class="">{message.text}</div>
+              <time class="text-xs opacity-50"
+                >{message.time || 'Just now'}</time
+              >
             </div>
-            <div class="">{message.text}</div>
-            <time class="text-xs opacity-50">{message.time || 'Just now'}</time>
-          </div>
-        {/each}
+          {/each}
+        </div>
       </div>
       <div class="centerChris">
         <input
