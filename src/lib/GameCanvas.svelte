@@ -21,6 +21,7 @@
   let timerRunning = false;
   let gameOver = false;
   const avatars = {}; // Store preloaded avatars
+  const houses = {}; // similarly store preloaded houses
   /** @type {null | {x: number, y: number}} */
   let lastPosition = { x: null, y: null };
   function gameLoop() {
@@ -74,6 +75,10 @@
   function drawPlayers() {
     // console.log("Drawing players:", players);
     players.forEach((player) => {
+      const house = houses[player.userNameClock];
+      if (house) {
+        ctx.drawImage(house, player.houseX, player.houseY, 150, 150);
+      }
       const avatar = avatars[player.userNameClock];
       if (avatar) {
         ctx.drawImage(avatar, player.x, player.y, 50, 50);
@@ -85,10 +90,17 @@
   function preloadAvatars() {
     players.forEach((player) => {
       const avatar = new Image();
+      const house = new Image();
       avatar.src = player.avatar;
+      console.log('house string is ', player.houseString);
+      house.src = player.houseString;
       avatar.onload = () => {
         avatars[player.userNameClock] = avatar;
         console.log(`Preloaded avatar for player: ${player.userNameClock}`);
+      };
+      house.onload = () => {
+        houses[player.userNameClock] = house;
+        console.log(`Preloaded house for player: ${player.userNameClock}`);
       };
     });
   }
@@ -133,7 +145,7 @@
     });
 
     socket.on('initializePlayers', (playersData) => {
-      // console.log("Initializing players:", playersData);
+      console.log('Initializing players:', playersData);
       players = playersData;
       preloadAvatars(); // Preload avatars when players are initialized
       redrawCanvas();
