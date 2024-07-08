@@ -43,7 +43,7 @@ function createLobby(socket, lobbyName, io) {
     isDayTransitionInProgress: false,
   };
   lobbies[lobbyName] = newLobby;
-  io.to(socket.id).emit("lobbyWelcome", { gameName: lobbyName });
+  io.to(socket.id).emit('lobbyWelcome', { gameName: lobbyName });
   return lobbyName;
 }
 
@@ -71,18 +71,21 @@ function joinLobby(socket, lobbyName, io, userNameClock) {
   /** @type {Player} */
   const newPlayer = {
     userNameClock,
-    team: "",
+    team: '',
     alive: true,
-    role: "",
+    role: '',
     x: 100,
     y: 100,
-    avatar: "/default.svg",
+    avatar: '/default.svg',
     socketID: socket.id,
+    houseString: '/houseSVG.svg',
+    houseX: -100,
+    houseY: -100,
   };
   lobby.players.push(newPlayer);
 
   socket.join(lobbyName, () => {
-    io.to(lobbyName).emit("lobbyPlayersUpdate", {
+    io.to(lobbyName).emit('lobbyPlayersUpdate', {
       players: lobby.players.map((player) => ({
         userNameClock: player.userNameClock,
         team: player.team,
@@ -109,34 +112,37 @@ function startGame(lobbyName, io, flag) {
 
   lobby.players = assignRoles(lobby.players);
   lobby.players.forEach((player) => {
-    const playerSocket = io.of("/clock").sockets.get(player.socketID);
+    const playerSocket = io.of('/clock').sockets.get(player.socketID);
     if (playerSocket) {
-      playerSocket.emit("roleAssigned", {
+      playerSocket.emit('roleAssigned', {
         role: player.role,
         team: player.team,
       });
     }
   });
-  const centerX = 850;
-  const centerY = 540;
-  const radius = 100;
+  const centerX = 779;
+  const centerY = 462;
+  const radius = 200;
+  const houseOffset = 120; //distance from the players pos to the house
   lobby.players.forEach((player, index, playersArray) => {
     const angle = (index / playersArray.length) * 2 * Math.PI;
     player.x = centerX + radius * Math.cos(angle);
     player.y = centerY + radius * Math.sin(angle);
+    player.houseX = centerX + (radius + houseOffset) * Math.cos(angle);
+    player.houseY = centerY + (radius + houseOffset) * Math.sin(angle);
     console.log(
       `Initial position for ${player.userNameClock}: x=${player.x}, y=${player.y}`,
     );
   });
   lobby.gameStarted = true;
-  io.of("/clock").to(lobbyName).emit("initializePlayers", lobby.players);
+  io.of('/clock').to(lobbyName).emit('initializePlayers', lobby.players);
   if (flag === 0) {
     setTimeout(() => {
       startGame(lobbyName, io, 1);
-      console.log("starting the game loop");
+      console.log('starting the game loop');
     }, 3000);
   }
-  io.of("/clock").to(lobbyName).emit("firstDay", 1);
+  io.of('/clock').to(lobbyName).emit('firstDay', 1);
   lobby.day = 1;
   // if (flag === 1) {
   //     manageGamePhases(lobby, io);//start the game loop
@@ -155,7 +161,7 @@ function leaveLobby(socket, lobbyName) {
     );
 
     const updatedPlayers = lobby.players.map((player) => player.userNameClock);
-    io.to(lobbyName).emit("lobbyPlayersUpdate", { players: updatedPlayers });
+    io.to(lobbyName).emit('lobbyPlayersUpdate', { players: updatedPlayers });
 
     if (lobby.players.length === 0) {
       delete lobbies[lobbyName];
@@ -177,7 +183,7 @@ function getLobbies() {
 function getLobbyPlayers(lobbyName) {
   const lobby = lobbies[lobbyName];
   if (lobby && lobby.players) {
-    console.log("the value of players array is ", lobby.players);
+    console.log('the value of players array is ', lobby.players);
     return lobby.players;
   } else {
     return [];
@@ -226,14 +232,14 @@ function getGameStarted(lobbyName) {
  */
 function assignRoles(players) {
   const shuffledPlayers = players.sort(() => 0.5 - Math.random());
-  shuffledPlayers[0].role = "Leviathan";
-  shuffledPlayers[0].team = "EvilTeam";
-  shuffledPlayers[1].role = "Goblin";
-  shuffledPlayers[1].team = "EvilTeam";
+  shuffledPlayers[0].role = 'Leviathan';
+  shuffledPlayers[0].team = 'EvilTeam';
+  shuffledPlayers[1].role = 'Goblin';
+  shuffledPlayers[1].team = 'EvilTeam';
 
   for (let i = 2; i < shuffledPlayers.length; i++) {
-    shuffledPlayers[i].role = "Good";
-    shuffledPlayers[i].team = "GoodTeam";
+    shuffledPlayers[i].role = 'Good';
+    shuffledPlayers[i].team = 'GoodTeam';
   }
 
   return shuffledPlayers;
