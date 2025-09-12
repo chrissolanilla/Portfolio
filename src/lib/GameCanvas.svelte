@@ -82,7 +82,6 @@
       const avatar = avatars[player.userNameClock];
       if (avatar) {
         ctx.drawImage(avatar, player.x, player.y, 50, 50);
-        // console.log(`Drew player at x: ${player.x}, y: ${player.y}`);
       }
     });
   }
@@ -117,8 +116,10 @@
     let canvas = document.getElementById('canvas');
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
-    canvas.width = windowWidth / 1.2;
-    canvas.height = windowHeight;
+    // canvas.width = windowWidth / 1.2;
+    // canvas.height = windowHeight;
+    canvas.width = 1200;
+    canvas.height = 800;
     ctx = canvas.getContext('2d');
     if (!ctx) {
       console.error('Failed to get canvas context');
@@ -246,6 +247,10 @@
       sendMessage();
     }
   }
+  function restartGame() {
+    socket.emit('restartGame', { lobbyName: lobbyName });
+    gameOver = false;
+  }
 </script>
 
 <style>
@@ -275,8 +280,10 @@
 {/if}
 <h1>Night status {isNight}</h1>
 {#if !gameOver}
-  <div class="flex align-center">
-    <canvas id="canvas"></canvas>
+  <div class="flex align-center justify-center">
+    <div style="inline-block;">
+      <canvas id="canvas"></canvas>
+    </div>
     <!-- some simple chat box for players to talk -->
     <!-- Chat interface -->
     <div class="BeforeRowREverse">
@@ -310,6 +317,9 @@
   </div>
 {:else}
   <h1>The game is over... {gameOver}</h1>
+  <button on:click="{restartGame}" class="btn btn-secondary"
+    >Restart game?</button
+  >
 {/if}
 <h1>your role is {clientRole}.</h1>
 

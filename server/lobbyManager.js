@@ -76,11 +76,15 @@ function joinLobby(socket, lobbyName, io, userNameClock) {
     role: '',
     x: 100,
     y: 100,
+    houseX: 100,
+    houseY: 100,
     avatar: '/default.svg',
     socketID: socket.id,
     houseString: '/houseSVG.svg',
     houseX: -100,
     houseY: -100,
+    isInsideHouse: false,
+    CurrentHouse: '',
   };
   lobby.players.push(newPlayer);
 
@@ -120,8 +124,8 @@ function startGame(lobbyName, io, flag) {
       });
     }
   });
-  const centerX = 779;
-  const centerY = 462;
+  const centerX = 1200 / 2;
+  const centerY = 800 / 2;
   const radius = 200;
   const houseOffset = 120; //distance from the players pos to the house
   lobby.players.forEach((player, index, playersArray) => {
@@ -244,6 +248,39 @@ function assignRoles(players) {
 
   return shuffledPlayers;
 }
+
+/**
+ * @param {string} lobbyName
+ * @returns {Lobby | null}
+ */
+function resetLobby(lobbyName) {
+  const lobby = lobbies[lobbyName];
+  if (!lobby) return null;
+
+  // Reset lobby state
+  lobby.gameStarted = false;
+  lobby.day = 0;
+  lobby.isNight = false;
+  lobby.isDayTransitionInProgress = false;
+
+  // Reset players
+  lobby.players.forEach((player) => {
+    player.alive = true;
+    player.team = '';
+    player.role = '';
+    player.x = 100;
+    player.y = 100;
+    player.houseX = -100;
+    player.houseY = -100;
+    player.isInsideHouse = false;
+    player.CurrentHouse = '';
+  });
+
+  startGame(lobbyName, io, 0);
+
+  return lobby;
+}
+
 export default {
   createLobby,
   joinLobby,
@@ -254,4 +291,5 @@ export default {
   retrieveLobbyNameFromSocket,
   getGameStarted,
   startGame,
+  resetLobby,
 };

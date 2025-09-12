@@ -145,6 +145,29 @@ export function handleClockNamespace(io, lobbyManager) {
       socket.emit('lobbiesList', currentLobbies);
     });
 
+    socket.on('restartGame', ({ lobbyName }) => {
+      const lobby = lobbyManager.resetLobby(lobbyName);
+      if (lobby) {
+        clock.to(lobbyName).emit('gameRestarted', {
+          players: lobby.players.map((player) => ({
+            userNameClock: player.userNameClock,
+            team: player.team,
+            alive: player.alive,
+            role: player.role,
+            x: player.x,
+            y: player.y,
+            avatar: player.avatar,
+          })),
+          gameStarted: lobby.gameStarted,
+          day: lobby.day,
+          isNight: lobby.isNight,
+        });
+        console.log(`Lobby ${lobbyName} has been reset.`);
+      } else {
+        socket.emit('lobbyError', { message: 'Could not reset the lobby.' });
+      }
+    });
+
     socket.on('joinLobby', ({ lobbyName, userNameClock }) => {
       const success = lobbyManager.joinLobby(
         socket,
@@ -171,6 +194,28 @@ export function handleClockNamespace(io, lobbyManager) {
       lobbyManager.vote(lobbyName, voter, voteFor);
     });
 
+    function checkIfNearHouse(player, lobby) {
+      let isInHouse = player.isInsideHouse;
+      let currentHouse = player.CurrentHouse;
+      lobby.players.forEach((houseOwner) => {
+        if (
+          houseOwner.houseX &&
+          houseOwner.houseY &&
+          Math.abs(player.x - houseOwner.houseX) < 10 &&
+          Math.abs(player.y - houseOwner.houseY) < 10
+        ) {
+          isInHouse = true;
+          currentHouse = houseOwner.userNameClock;
+          console.log(`we are inside the house ${currentHouse}`);
+
+          player.houseX = 50;
+          player.houseY = 50;
+        }
+      });
+      player.isInsideHouse = isInHouse;
+      player.house = currentHouse;
+    }
+
     socket.on('playerMoved', ({ id, x, y, lobbyName }) => {
       const lobbies = lobbyManager.getLobbies();
       const lobby = lobbies.find((lobby) => lobby.name === lobbyName);
@@ -183,7 +228,16 @@ export function handleClockNamespace(io, lobbyManager) {
 
       player.x = x;
       player.y = y;
-      clock.to(lobbyName).emit('updatePlayerPosition', { id, x, y });
+
+      //check if a player is inside a house
+      checkIfNearHouse(player, lobby);
+      clock.to(lobbyName).emit('updatePlayerPosition', {
+        id,
+        x,
+        y,
+        isInHouse: player.isInsideHouse,
+        currentHouse: player.CurrentHouse,
+      });
     });
 
     //get what day it is, probalby some socket.on next day or next night
