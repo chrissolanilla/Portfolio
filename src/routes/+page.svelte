@@ -1,27 +1,150 @@
 
 <svelte:head>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.net.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.net.min.js"></script> -->
 
 </svelte:head>
 <script lang="ts">
-    import { onMount } from 'svelte';
+	import { onMount, onDestroy, tick } from "svelte";
+	import * as THREE from "three";
+	import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+	import NET from "vanta/dist/vanta.net.min.js";
 
-    let message = 'Loading...';
+	let vantaEffect: any = null;
 
-    onMount(async () => {
-        const response = await fetch('http://localhost:3000/api/sayHi');
-        if (response.ok) {
-            message = await response.text();
-        } else {
-            message = 'Failed to fetch message';
-        }
+	// ---- GIF -> 3D toggle ----
+	let showModel = false;
+	let mountEl: HTMLDivElement | null = null;
 
-       
-    });
+	let renderer: THREE.WebGLRenderer | undefined;
+	let scene: THREE.Scene | undefined;
+	let camera: THREE.PerspectiveCamera | undefined;
+	let raf = 0;
+	let resizeHandler: (() => void) | undefined;
 
-    function scrollToContent() {
+	async function showThree() {
+		console.log("we are doing our fucntion")
+	  showModel = true;
+	  await tick(); // ensure mountEl exists
+	  initThree();
+	}
+
+	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+function initThree() {
+  if (!mountEl) return;
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    50,
+    mountEl.clientWidth / mountEl.clientHeight,
+    0.1,
+    100
+  );
+  camera.position.set(0, 1.2, 2.2);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(mountEl.clientWidth, mountEl.clientHeight);
+  mountEl.appendChild(renderer.domElement);
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 1.1);
+  scene.add(hemi);
+
+  // helpful: one directional light so models don’t look flat
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(3, 3, 3);
+  scene.add(dir);
+
+  // controls (optional but nice)
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  const loader = new GLTFLoader();
+  loader.load(
+    '/otherface.glb',                                   // put file in /static
+    (gltf) => {
+      const root = gltf.scene;
+      // make sure it’s not microscopic or huge
+      root.scale.setScalar(1);                          // adjust if needed
+      root.position.set(0, 0, 0);
+      scene!.add(root);
+      console.log('GLB loaded:', root);
+    },
+    undefined,
+    (err) => console.error('GLB load error:', err)
+  );
+
+  resizeHandler = () => {
+    if (!mountEl || !camera || !renderer) return;
+    const w = mountEl.clientWidth || 1;
+    const h = mountEl.clientHeight || 1;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  };
+  window.addEventListener('resize', resizeHandler);
+
+  const loop = () => {
+    raf = window.requestAnimationFrame(loop);
+    controls.update();
+    renderer!.render(scene!, camera!);
+  };
+  loop();
+}
+
+
+	onMount(() => {
+	  // init Vanta with the SAME THREE instance
+	  vantaEffect = NET({
+		el: "#vanta-element",
+		THREE, // <- critical: pass the imported THREE
+		mouseControls: true,
+		touchControls: true,
+		gyroControls: false,
+		minHeight: 200.0,
+		minWidth: 200.0,
+		scale: 1.0,
+		scaleMobile: 1.0,
+		color: 0xa739b6,
+		backgroundColor: 0x211443,
+		points: 6.0,
+	  });
+	});
+
+	onDestroy(() => {
+	  // cancelAnimationFrame(raf);
+	if (raf !== null && typeof window !== 'undefined' && 'cancelAnimationFrame' in window) {
+		window.cancelAnimationFrame(raf);
+	  }
+	  if (resizeHandler) window.removeEventListener("resize", resizeHandler);
+	  if (renderer) {
+		renderer.dispose();
+		renderer.domElement?.remove();
+	  }
+	  if (vantaEffect) vantaEffect.destroy();
+	});
+
+    // //end of stuff
+    // onMount(() => {
+    //     VANTA.NET({
+    //         el: "#vanta-element", // Target element ID
+    //         mouseControls: true,
+    //         touchControls: true,
+    //         gyroControls: false,
+    //         minHeight: 200.00,
+    //         minWidth: 200.00,
+    //         scale: 1.00,
+    //         scaleMobile: 1.00,
+    //         color: 0xa739b6,
+    //         backgroundColor: 0x211443,
+    //         points: 6.00
+    //     });
+    // });
+
+	    function scrollToContent() {
         const contentElement = document.querySelector('.content');
         if(contentElement)
             contentElement.scrollIntoView({ behavior: 'smooth' });
@@ -34,22 +157,6 @@
         goto('/clock');
     }
 
-    //end of stuff
-    onMount(() => {
-        VANTA.NET({
-            el: "#vanta-element", // Target element ID
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0xa739b6,
-            backgroundColor: 0x211443,
-            points: 6.00
-        });
-    });
 </script>
 
 
@@ -57,6 +164,16 @@
 </div>
 
 <header class="intro">
+	<div class="headGif">
+		{#if !showModel}
+			<img src="out.gif" alt="head gif" class="gifButton" on:click={showThree}
+				on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && showThree()}
+			>
+		{:else}
+			<div class="threeHolder" bind:this={mountEl} />
+		{/if}
+	</div>
+
     <div class="name-container">
         <h2 class="hi">Hi, I'm</h2>
         <h1 class="name">Christopher Solanilla,</h1>
@@ -74,6 +191,7 @@
         </svg>
     </button>
 </header>
+
 <main class="content">
     <h1 class="projects">Projects</h1>
         <div class="card-container">
@@ -109,7 +227,7 @@
                 </a>
 
             </section>
-            
+
             <section class="card">
                 <a href="https://chibichain.com" target="_blank" class="">
                     <div class="thumbnail2" >
@@ -120,7 +238,7 @@
                 </a>
 
             </section>
-            
+
             <section class="card">
                 <a href="https://kawaiikulture.shop" target="_blank" class="">
                     <div class="thumbnail">
@@ -148,11 +266,40 @@
     </div>
 </div>
 
-<style>
+<style lang="scss">
 
     :global(body) {
         overflow-x: hidden;
     }
+
+	.headGif {
+		.threeHolder {
+		width:500px;
+		height:500px;
+		border-radius: 10%;
+		overflow:hidden;
+		z-index: 10;
+	}
+		img {
+			border-radius: 10%;
+
+			height: 500px;
+			cursor: pointer;
+			transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+			box-shadow: 0 4px 14px rgba(0,0,0,.18);
+		}
+
+		img:hover {
+			transform: scale(1.03);
+			box-shadow: 0 12px 28px rgba(0,0,0,.35);
+			filter: brightness(1.05) saturate(1.05);
+		}
+
+		img:focus-visible {
+			outline: 3px solid #3ac2ff;
+			outline-offset: 3px;
+		}
+	}
 
     .btn-primary {
     --btn-color: #ff7cc4; /* Primary button color set to #ff7cc4 */
@@ -224,8 +371,8 @@
     /* Make the SVG button more visible and ensure it's not displayed none as in your friend's styles */
     .intro > #down {
         display: block; /* or inline-block depending on your layout needs */
-        position: absolute; /* Position it at the bottom of the intro section */
         bottom: calc(var(--scale) * 1.6731588443448342);
+		bottom:10%;
         opacity: 1; /* Adjust the opacity to make it visible */
         transition: opacity 0.3s ease; /* Transition for the opacity change */
     }
@@ -277,21 +424,21 @@
         text-align: initial !important;
         background: var(--content-bg) !important;
         text-decoration: none !important;
-        
+
         margin-bottom: 32px !important;
     }
-    
+
     .card:hover {
         transform: translateY(-5px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    
+
     .thumbnail img {
         width: 100%;
         height: auto;
         border-radius: 4px;
     }
-    
+
     .thumbnail2 img {
         width: 100%;
         height: auto;
@@ -310,7 +457,7 @@
         padding-bottom: 0%;
         margin-bottom: 0%;
     }
-    
+
     .links a {
         padding: 12px;
     }
@@ -319,12 +466,12 @@
         font-weight: bold;
         margin-top: 8px;
     }
-    
+
     .desc {
         margin-top: 4px;
         color: var(--secondary-fg);
     }
-    
+
     @media (max-width: 768px) {
         .card-container {
             flex-direction: column;
@@ -338,9 +485,9 @@
     @media (min-width: 801px) {
         .card {
             max-width: calc((100% - 32px) / 3);
-        }        
+        }
     }
-    
+
     #vanta-element {
         position: fixed; /* or 'absolute' if that works better for your layout */
         top: 0;
