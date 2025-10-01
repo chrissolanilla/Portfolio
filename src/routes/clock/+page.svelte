@@ -1,7 +1,6 @@
 <script>
     import { onMount } from 'svelte';
     import io from 'socket.io-client';
-    import "../../app.css"
     import { browser } from '$app/environment';
     import {socketStore} from '../../stores/socketStore'
 
@@ -19,19 +18,19 @@
                 socket = value;
                 //moving all socket event listeners inside the subscribe?
                 socket = io(backendURL);
-        
+
                 socket.emit('getLobbies'); // Request the list of lobbies
-        
+
                 socket.on('lobbiesList', (receivedLobbies) => {
                     lobbies = receivedLobbies;
                 });
-    
+
                 socket.on('lobbyCreated', (newLobby) => {
                     //when new lobby created make it reactive
                     lobbies = [...lobbies, newLobby];
                 })
-                
-                
+
+
                 // Additional functions for creating lobbies, leaving lobbies, etc.
                 socket.on('lobbyCreationFailed', (message) => {
                     errMsg = message; // Update the errorMessage with the received message
@@ -42,11 +41,11 @@
 
         });
     }
-    
+
     function joinLobby(lobbyId) {
         socket.emit('joinLobby', lobbyId);
     }
-    
+
     function createLobby(event) {
         event.preventDefault(); // Prevent the default form submission
         socket.emit('createLobby', gameName); // Use the gameName state variable as the lobby name
@@ -62,7 +61,7 @@
                 <a href={`/lobby/${lobby.name}`} class="btn btn-outline btn-accent m-2">{lobby.name}</a>
             {/each}
           </div>
-          
+
     </div>
 
     <div class="divider lg:divider-horizontal">

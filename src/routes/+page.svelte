@@ -10,6 +10,7 @@
 	import * as THREE from "three";
 	import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 	import NET from "vanta/dist/vanta.net.min.js";
+	import Header from "$lib/Header.svelte";
 
 	let vantaEffect: any = null;
 
@@ -127,24 +128,8 @@ function initThree() {
 	  if (vantaEffect) vantaEffect.destroy();
 	});
 
-    // //end of stuff
-    // onMount(() => {
-    //     VANTA.NET({
-    //         el: "#vanta-element", // Target element ID
-    //         mouseControls: true,
-    //         touchControls: true,
-    //         gyroControls: false,
-    //         minHeight: 200.00,
-    //         minWidth: 200.00,
-    //         scale: 1.00,
-    //         scaleMobile: 1.00,
-    //         color: 0xa739b6,
-    //         backgroundColor: 0x211443,
-    //         points: 6.00
-    //     });
-    // });
 
-	    function scrollToContent() {
+	function scrollToContent() {
         const contentElement = document.querySelector('.content');
         if(contentElement)
             contentElement.scrollIntoView({ behavior: 'smooth' });
@@ -160,6 +145,7 @@ function initThree() {
 </script>
 
 
+<Header />
 <div id="vanta-element" class="intro">
 </div>
 
@@ -252,19 +238,19 @@ function initThree() {
     </div>
 </main>
 <!--button to scroll to other parts of the website-->
-<div class = "OtherSection">
-    <button id="down" on:click={scrollToContent}>
-        <svg width="192" height="96" version="1.1" viewBox="-2 -2 196 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="m12 12 84 72 84-72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" style="paint-order:stroke fill markers"></path>
-        </svg>
-    </button>
-    <h1>While you're here, try checking out some cool features of this site</h1>
-    <div class="content2">
-
-        <button class= "btn btn-primary" on:click={goToChat}>Real Time Chat Room</button>
-        <button class= "btn btn-primary" on:click={goToClock}>Clock Tower</button>
-    </div>
-</div>
+<!-- <div class = "OtherSection"> -->
+<!--     <!-- <button id="down" on:click={scrollToContent}> -->
+<!--     <!--     <svg width="192" height="96" version="1.1" viewBox="-2 -2 196 100" xmlns="http://www.w3.org/2000/svg"> -->
+<!--     <!--         <path d="m12 12 84 72 84-72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" style="paint-order:stroke fill markers"></path> -->
+<!--     <!--     </svg> -->
+<!--     <!-- </button> -->
+<!--     <h1>While you're here, try checking out some cool features of this site</h1> -->
+<!--     <div class="content2"> -->
+<!---->
+<!--         <button class= "btn btn-primary" on:click={goToChat}>Real Time Chat Room</button> -->
+<!--         <button class= "btn btn-primary" on:click={goToClock}>Clock Tower</button> -->
+<!--     </div> -->
+<!-- </div> -->
 
 <style lang="scss">
 
@@ -378,10 +364,12 @@ function initThree() {
     }
     .name-container > .name {
         font-size: calc(var(--scale) * 2);
+		margin: 0;
     }
     .hi {
         text-align: start !important;
         color:white !important;
+		margin: 0;
     }
     .who {
         color: rgb(27, 143, 211) !important;
@@ -481,7 +469,15 @@ function initThree() {
         section {
             width: 22rem;
         }
+
+		.headGif {
+			img {
+				height:400px;
+			}
+        }
+
     }
+
     @media (min-width: 801px) {
         .card {
             max-width: calc((100% - 32px) / 3);
@@ -489,7 +485,8 @@ function initThree() {
     }
 
     #vanta-element {
-        position: fixed; /* or 'absolute' if that works better for your layout */
+        // position: fixed; /* or 'absolute' if that works better for your layout */
+		position: fixed;
         top: 0;
         left: 0;
         width: 100%;
@@ -498,6 +495,6 @@ function initThree() {
     }
 
 
-    </style>
+</style>
 
 

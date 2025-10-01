@@ -128,7 +128,6 @@
 
 
 <style>
-  @import "../../app.css" ;
   .outerContainer {
 	/* display: flex; */
 	/* flex-direction: column-reverse; */

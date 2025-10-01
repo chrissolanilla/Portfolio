@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Sans&display=swap');
+
 :root {
     --font: "Source Serif Pro", "Times New Roman", Times, serif;
     --code-font: "Ubuntu Mono", "Courier New", Courier, monospace;
     --header-font: Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     --body-bg: #fff;
-    --content-bg: #fff;
-    --fg: #000;
+    --content-bg: #333538;
+    --fg: #fff;
     --secondary-fg: #888;
     --selection: #07f4;
     --hr: #ccc;
@@ -24,18 +26,20 @@
 
 body {
     background-color: #2c2a2e;
-    font-family: arial;
+    font-family: funnel-sans;
+	margin:0;
 }
 * {
     box-sizing: border-box;
 }
 
 a:visited:not(.unvisitable) {
-    color: #00cc88; /* Adjusted for simplicity */
+    color: #00cc88;
 }
 
 a  {
-    color: #e2ee3e; /* Adjusted for simplicity */
+	color: #00cc88;
+
 }
 
 
