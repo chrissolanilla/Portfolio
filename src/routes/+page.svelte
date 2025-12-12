@@ -181,6 +181,38 @@ function initThree() {
 <main class="content">
     <h1 class="projects">Projects</h1>
         <div class="card-container">
+
+            <section class="card">
+                <a href="https://bustopher.itch.io/what-kills-you-makes-you-stronger" target="_blank" class="">
+                    <div class="thumbnail3" >
+                        <img src="Wkymys.png" alt="steps">
+                    </div>
+                    <div class="title">What Kills You Makes You Stronger</div>
+                    <p class="desc">A game made in 3 days for the Jacksepticye Spooky Game Jam where you play as a ghost solving puzzles. Ranked 318th place out of 1,164 entries.</p>
+                </a>
+			</section>
+
+            <section class="card">
+                <a href="https://chrissolanilla.github.io/Steps-website/" target="_blank" class="">
+                    <div class="thumbnail3" >
+                        <img src="steps.png" alt="steps">
+                    </div>
+                    <div class="title">S.T.E.P.S.</div>
+                    <p class="desc">An Arcade Dance Rhythmn Game Machine tracking player pose while delevering a classic DDR/PIU experience. This was my senior design project for my Undergrad in Computer Engineering I lead a group of 5 engineers to design and fabricate the circuits, gameplay, and optics aspects. </p>
+                </a>
+			</section>
+
+            <section class="card">
+                <a href="https://github.com/chrissolanilla/Deck-builder" target="_blank" class="">
+                    <div class="thumbnail2" >
+                        <img src="CardsOfMayhem.png" alt="screenshot">
+                    </div>
+                    <div class="title">Cards of Mayhem</div>
+                    <p class="desc">A 3D real-time action card game deck builder that combines FPS and Yugioh mechanics. Lead a team of 4 developers where I made the base engine mechanics for card system and deck building. Made in Godot 4.</p>
+                </a>
+
+            </section>
+
             <section class="card">
                 <a href="https://bustopher.itch.io/yatagarasu-sunshine" target="_blank" class="">
                     <div class="thumbnail3" >
@@ -204,7 +236,7 @@ function initThree() {
             </section>
 
             <section class="card">
-                <a href="https://chessconnect.xyz/threeD/test.html" target="_blank" class="">
+                <a href="https://github.com/Swolis/4331sp14/tree/main/Frontend/threeD" target="_blank" class="">
                     <div class="thumbnail">
                         <img src="chessconnect3d.PNG" alt="screenshot">
                     </div>
@@ -225,6 +257,17 @@ function initThree() {
 
             </section>
 
+
+            <section class="card">
+                <a href="https://github.com/chrissolanilla/busto-browser" target="_blank" class="">
+                    <div class="thumbnail2" >
+                        <img style="height: 350px;"src="BustoBrowser.png" alt="screenshot">
+                    </div>
+                    <div class="title">Busto Browser</div>
+                    <p class="desc">A heavily under development custom browser made with Vulkan in C++. Right now it renders HTML and some CSS, with no plans of utilizing JavaScript in place of my own web language(coming soon)</p>
+                </a>
+
+            </section>
             <section class="card">
                 <a href="https://kawaiikulture.shop" target="_blank" class="">
                     <div class="thumbnail">
@@ -236,21 +279,74 @@ function initThree() {
 
             </section>
     </div>
+
+	<h1 style="text-align: center;">Professional Work</h1>
+	<div class="card-container">
+
+		<section class="card">
+                <a href="https://legacy5.netlify.app/" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="LEGACY5.png" alt="screenshot"> </div>
+                    <div class="title">Legacy 5</div>
+                    <p class="desc">A simple website I made for Legacy 5 as hired freelance developer. It showcases how private equity can be a valuale investment for tomorrow.</p>
+				</a>
+
+		</section>
+
+		<section class="card">
+                <a href="https://ppaths.netlify.app/" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="PPaths.png" alt="screenshot"> </div>
+                    <div class="title">PPAThs</div>
+                    <p class="desc">Another simple website I made for PPaths as hired freelance developer. It has Stripe integration for payments so people can donate to organizations that take care of children.</p>
+				</a>
+
+		</section>
+
+		<section class="card">
+                <a href="https://game.triangle-puzzle.com/" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="Triangles.png" alt="screenshot"> </div>
+                    <div class="title">Triangle Puzzle</div>
+                    <p class="desc">A Unity 2D Triangle Puzzle Game I made while hired as an OPS Student working for Dr. Enrique Ortiz at UCF. I ended up majorly overhauling the feedback system of the game by providing a visual star system and incorperated my own email server for teachers to recieve when students are finished playing the game with stat metrics included. </p>
+				</a>
+
+		</section>
+
+		<section class="card">
+                <a href="https://www.mdtronics.net/" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="MDTronics.png" alt="screenshot"> </div>
+                    <div class="title">MDTronics</div>
+                    <p class="desc">A complete website for funnelling potential clients for medical equipment consulting made for MDTronics. I was in charge of the entire development of the site front to back.</p>
+				</a>
+
+		</section>
+
+		<section class="card">
+                <a href="https://materia.ucf.edu/" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="Materia.png" alt="screenshot"> </div>
+                    <div class="title">Materia</div>
+                    <p class="desc">A UCF affiliated Web Game Ehgine made for creating engaging apps. Both students and teachers can create tiny gradable games for their classes or for personal use. I played a big part in migrating the legacy PhP backend to Django as well numerous quality of life changes while working for Techrangers.</p>
+				</a>
+
+		</section>
+
+		<section class="card">
+                <a href="https://materia.ucf.edu/widgets/103-associations" target="_blank" class="">
+                    <div class="thumbnail">
+                        <img src="Associations.png" alt="screenshot"> </div>
+                    <div class="title">Associations</div>
+                    <p class="desc">A Materia widget Web Game that plays similar to NYT's Connections game. Teachers can create their own game of Associations with their own dimensions and get feedback from studnets who play their Associations game. Made all of my own libraries purely in HTML/CSS/JS for optimized performance.</p>
+				</a>
+
+		</section>
+
+	</div>
 </main>
-<!--button to scroll to other parts of the website-->
-<!-- <div class = "OtherSection"> -->
-<!--     <!-- <button id="down" on:click={scrollToContent}> -->
-<!--     <!--     <svg width="192" height="96" version="1.1" viewBox="-2 -2 196 100" xmlns="http://www.w3.org/2000/svg"> -->
-<!--     <!--         <path d="m12 12 84 72 84-72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" style="paint-order:stroke fill markers"></path> -->
-<!--     <!--     </svg> -->
-<!--     <!-- </button> -->
-<!--     <h1>While you're here, try checking out some cool features of this site</h1> -->
-<!--     <div class="content2"> -->
-<!---->
-<!--         <button class= "btn btn-primary" on:click={goToChat}>Real Time Chat Room</button> -->
-<!--         <button class= "btn btn-primary" on:click={goToClock}>Clock Tower</button> -->
-<!--     </div> -->
-<!-- </div> -->
+
+
 
 <style lang="scss">
 
@@ -398,22 +494,25 @@ function initThree() {
     }
 
     .card {
-        display: inline-flex !important;
-        flex-direction: column !important;
-        position: relative !important;
-        height: 400px !important;
-        border-radius: 4px !important;
-        border: 1px solid var(--hr) !important;
-        font-size: 11pt !important;
-        padding: 8px !important;
-        overflow: hidden !important;
-        transition: .2s transform !important;
-        color: var(--fg) !important;
-        text-align: initial !important;
-        background: var(--content-bg) !important;
-        text-decoration: none !important;
-
-        margin-bottom: 32px !important;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--content-bg);
+		border-radius: 4px;
+		padding: 0.5rem;
+        // flex-direction: column !important;
+        // height: 400px !important;
+        // border-radius: 4px !important;
+        // border: 1px solid var(--hr) !important;
+        // font-size: 11pt !important;
+        // padding: 8px !important;
+        // overflow: hidden !important;
+        // transition: .2s transform !important;
+        // color: var(--fg) !important;
+        // text-align: initial !important;
+        // background: var(--content-bg) !important;
+        // text-decoration: none !important;
+        //
+        // margin-bottom: 32px !important;
     }
 
     .card:hover {
@@ -433,7 +532,7 @@ function initThree() {
         border-radius: 4px;
     }
     .thumbnail3 {
-        height: 61%;
+        // height: 61%;
         border-radius: 4px;
         padding-bottom: 0%;
         margin-bottom: 0%;
@@ -453,11 +552,12 @@ function initThree() {
         font-size: var(--scale);
         font-weight: bold;
         margin-top: 8px;
+		text-align: center;
     }
 
     .desc {
         margin-top: 4px;
-        color: var(--secondary-fg);
+        color: #fff;
     }
 
     @media (max-width: 768px) {
