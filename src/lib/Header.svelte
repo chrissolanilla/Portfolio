@@ -23,7 +23,7 @@
 		<!-- class="text-hoverable animate-fade-left flex items-center justify-center gap-2" -->
 		<a
 		class ="resumeA"
-		  href="https://drive.google.com/file/d/1dzZtw0_FFlZX52O3-2Pb6zLKfB4-G0__/view?usp=sharing"
+		  href="https://drive.google.com/file/d/1uQleI8iDyHOmncwE3oVeAxdoxhOjEeBi/view?usp=sharing"
 		  target="_blank"
 		>
 		  <p class="resume">
@@ -112,7 +112,7 @@
   <div class="overlay" role="dialog" aria-modal="true" id="mobile-menu" on:click|self={() => (open = false)}>
     <div class="sheet">
       <button class="close" aria-label="Close menu" on:click={() => (open = false)}>✕</button>
-      <a href="https://drive.google.com/file/d/1dzZtw0_FFlZX52O3-2Pb6zLKfB4-G0__/view?usp=sharing" target="_blank" on:click={() => (open = false)}>Resume</a>
+      <a href="https://drive.google.com/file/d/1uQleI8iDyHOmncwE3oVeAxdoxhOjEeBi/view?usp=sharing" target="_blank" on:click={() => (open = false)}>Resume</a>
       <a href="https://bustopher.itch.io/" on:click={() => (open = false)} target="_blank">Itch.io</a>
       <a href="https://github.com/chrissolanilla" on:click={() => (open = false)} target="_blank">Github</a>
       <a href="https://www.linkedin.com/in/christopher-solanilla-837299224/" on:click={() => (open = false)} target="_blank">LinkedIn</a>
