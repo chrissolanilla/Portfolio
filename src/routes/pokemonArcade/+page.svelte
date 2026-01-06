@@ -160,12 +160,12 @@
       border-radius: 999px;
     }
 
-    /* make b offset like the nes */
-    .b {
+    /* make a offset like the nes */
+    .a {
       transform: translateY(-8px);
     }
 
-    .b:active {
+    .a:active {
       transform: translateY(-8px) scale(0.98);
     }
   }
@@ -201,8 +201,8 @@
       </div>
 
       <div class="ab" aria-label="a b buttons">
-        <button class="a" id="a">A</button>
         <button class="b" id="b">B</button>
+        <button class="a" id="a">A</button>
       </div>
     </div>
   </div>
