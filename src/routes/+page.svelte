@@ -259,7 +259,7 @@ function initThree() {
 
 
             <section class="card">
-                <a href="https://github.com/chrissolanilla/busto-browser" target="_blank" class="">
+                <a href="https://github.com/chrissolanilla/busto-browser-C" target="_blank" class="">
                     <div class="thumbnail2" >
                         <img style="height: 350px;"src="BustoBrowser.png" alt="screenshot">
                     </div>
